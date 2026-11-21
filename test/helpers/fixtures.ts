@@ -90,3 +90,94 @@ export async function aclOf(contractAddress: string) {
     ethers.provider,
   );
 }
+
+// -------------------------------------------------------------------------------------------------
+// Phase B: Liar and reveal
+// -------------------------------------------------------------------------------------------------
+
+/** One hour, `BluffDice.PROOF_TIMEOUT`. */
+export const PROOF_TIMEOUT = 3600n;
+
+/**
+ * KMS errors. They are thrown by the coprocessor's KMSVerifier, not by our contract, so they are not in our
+ * ABI. Names checked against @fhevm/host-contracts KMSVerifier.sol and observed in mock.
+ */
+export const KMS_ERRORS = {
+  interface: new ethers.Interface([
+    "error KMSInvalidSigner(address invalidSigner)",
+    "error EmptyDecryptionProof()",
+    "error DeserializingDecryptionProofFail()",
+    "error KMSSignatureThresholdNotReached(uint256 numSignatures)",
+    "error KMSZeroSignature()",
+  ]),
+};
+
+/**
+ * Every die of a started table in reveal order (seat 0..n-1, then die 0..4), decrypted with the mock-only
+ * debugger, which bypasses the ACL. Tests use it to choose a bid with a known outcome BEFORE anything is public.
+ */
+export async function decryptAll(game: BluffDice, tableId: bigint): Promise<bigint[]> {
+  const t = await game.getTable(tableId);
+  const values: bigint[] = [];
+  for (let seat = 0; seat < Number(t.maxPlayers); ++seat) {
+    for (const h of await game.diceOf(tableId, t.players[seat])) {
+      values.push(await fhevm.debugger.decryptEuint(FhevmType.euint8, h));
+    }
+  }
+  return values;
+}
+
+/** Number of `values` equal to `face`. */
+export function countFace(values: readonly bigint[], face: number): number {
+  return values.filter((v) => v === BigInt(face)).length;
+}
+
+/**
+ * Seat 0 bids (quantity, face) and seat 1 calls "Liar". So the bidder is seat 0 and the caller is seat 1;
+ * seats 2 and 3 (if any) are not part of the challenge.
+ */
+export async function playToLiar(
+  game: BluffDice,
+  tableId: bigint,
+  players: HardhatEthersSigner[],
+  quantity: number,
+  face: number,
+): Promise<ContractTransactionReceipt> {
+  await (await game.connect(players[0]).bid(tableId, quantity, face)).wait();
+  return (await (await game.connect(players[1]).callLiar(tableId)).wait())!;
+}
+
+/** The KMS answer for a table's reveal: `fhevm.publicDecrypt(revealHandles)`, handles in storage order. */
+export async function revealProof(game: BluffDice, tableId: bigint) {
+  const handles = await game.revealHandles(tableId);
+  const r = await fhevm.publicDecrypt([...handles]);
+  return { handles: [...handles], ...r };
+}
+
+/** Clear values of a `publicDecrypt` result in the order of `handles` (keys are lowercase handles). */
+export function clearValuesInOrder(handles: readonly string[], clearValues: Record<string, unknown>): bigint[] {
+  return handles.map((h) => {
+    const v = clearValues[h.toLowerCase()];
+    if (typeof v !== "bigint") throw new Error(`no bigint clear value for ${h}`);
+    return v;
+  });
+}
+
+/** Splits a 0x-prefixed byte string of 32-byte words into words (0x-prefixed). */
+export function words(hex: string): string[] {
+  const body = hex.slice(2);
+  if (body.length % 64 !== 0) throw new Error("not a whole number of words");
+  const out: string[] = [];
+  for (let i = 0; i < body.length; i += 64) out.push("0x" + body.slice(i, i + 64));
+  return out;
+}
+
+/** Joins 32-byte words back into one byte string. */
+export function joinWords(ws: readonly string[]): string {
+  return "0x" + ws.map((w) => w.slice(2)).join("");
+}
+
+/** One 32-byte big-endian word holding `v`. */
+export function word(v: bigint | number): string {
+  return ethers.zeroPadValue(ethers.toBeHex(v), 32);
+}

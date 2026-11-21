@@ -4,7 +4,15 @@ import { expect } from "chai";
 import { ethers, fhevm } from "hardhat";
 
 import { BluffDice } from "../types";
-import { DICE_PER_PLAYER, aclOf, decryptDiceAs, deployGame, fullTable } from "./helpers/fixtures";
+import {
+  DICE_PER_PLAYER,
+  aclOf,
+  clearValuesInOrder,
+  decryptDiceAs,
+  deployGame,
+  fullTable,
+  playToLiar,
+} from "./helpers/fixtures";
 
 /**
  * Dice ACL. Rule (from past winners' audits): an encrypted getter is tested by DECRYPTING it as the
@@ -94,6 +102,22 @@ describe("BluffDice: dice ACL", function () {
     expect(all).to.have.length(4 * DICE_PER_PLAYER);
     for (const h of all) expect(h).to.not.eq(ethers.ZeroHash);
     expect(new Set(all).size).to.eq(all.length);
+  });
+
+  it("after Liar every die is publicly decryptable; an outsider's publicDecrypt equals each owner's private view", async function () {
+    await playToLiar(game, tableId, players, 1, 1);
+    const acl = await aclOf(gameAddress);
+    const handles = [...(await game.revealHandles(tableId))];
+    for (const h of handles) expect(await acl.isAllowedForDecryption(h)).to.eq(true);
+
+    const publicValues = clearValuesInOrder(handles, (await fhevm.publicDecrypt(handles)).clearValues);
+    const privateValues: bigint[] = [];
+    for (const p of players) privateValues.push(...(await decryptDiceAs(game, tableId, p, p)));
+    expect(publicValues).to.deep.eq(privateValues);
+    // Public decryption adds no user-decryption right: another player still cannot user-decrypt my die.
+    await expect(fhevm.userDecryptEuint(FhevmType.euint8, handles[0], gameAddress, players[1])).to.be.rejectedWith(
+      `User ${players[1].address} is not authorized to user decrypt handle ${handles[0]}!`,
+    );
   });
 
   it("diceOf reverts NotPlayer for an address without a seat", async function () {
