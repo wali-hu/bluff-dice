@@ -1,7 +1,7 @@
 {
   "name": "bluff-dice",
-  "description": "Hardhat-based template for developing FHEVM Solidity smart contracts",
-  "version": "0.4.1",
+  "description": "Confidential Liar's Dice on FHEVM",
+  "version": "0.1.0",
   "engines": {
     "node": ">=20",
     "npm": ">=7.0.0"
