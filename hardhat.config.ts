@@ -16,6 +16,14 @@ import "./tasks/D6Probe";
 
 const MNEMONIC: string = vars.get("MNEMONIC", "test test test test test test test test test test test junk");
 const INFURA_API_KEY: string = vars.get("INFURA_API_KEY", "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz");
+// Optional: a single deployer key (stored with `npx hardhat vars set PRIVATE_KEY`, outside the repo).
+// When set, Sepolia uses it instead of MNEMONIC.
+const PRIVATE_KEY: string = vars.get("PRIVATE_KEY", "");
+// Optional: any Sepolia RPC URL (`npx hardhat vars set SEPOLIA_RPC_URL`); defaults to Infura.
+const SEPOLIA_RPC_URL: string = vars.get("SEPOLIA_RPC_URL", `https://sepolia.infura.io/v3/${INFURA_API_KEY}`);
+const sepoliaAccounts = PRIVATE_KEY
+  ? [PRIVATE_KEY.startsWith("0x") ? PRIVATE_KEY : `0x${PRIVATE_KEY}`]
+  : { mnemonic: MNEMONIC, path: "m/44'/60'/0'/0/", count: 10 };
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
@@ -49,13 +57,9 @@ const config: HardhatUserConfig = {
       url: "http://localhost:8545",
     },
     sepolia: {
-      accounts: {
-        mnemonic: MNEMONIC,
-        path: "m/44'/60'/0'/0/",
-        count: 10,
-      },
+      accounts: sepoliaAccounts,
       chainId: 11155111,
-      url: `https://sepolia.infura.io/v3/${INFURA_API_KEY}`,
+      url: SEPOLIA_RPC_URL,
     },
   },
   paths: {
