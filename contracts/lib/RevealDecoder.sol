@@ -33,4 +33,24 @@ library RevealDecoder {
             if (value == face) ++count;
         }
     }
+
+    /// @notice A decoded paid flag is not 0 or 1. Only a bug in the paid-flag code could produce this.
+    /// @param index Position of the word in `cleartexts`.
+    /// @param value Decoded value.
+    error InvalidPaidFlag(uint256 index, uint256 value);
+
+    /// @notice Decodes `n` paid flags (euint8 words holding 0 or 1) into a bit mask: bit i set = seat i paid.
+    /// @dev Same word-by-word rule as `countFace`; the caller checks `cleartexts.length == n * 32` first.
+    ///      The flags are `FHE.asEuint8(ebool)`, so their clear words use the euint8 encoding the dice already
+    ///      prove, not an ebool encoding (SPEC, Phase C approval 7). `n <= 8`. FHE ops: 0.
+    /// @param cleartexts Signed clear values, one 32-byte word per seat.
+    /// @param n Number of seats (words).
+    /// @return mask Bit mask of the seats whose flag is 1.
+    function paidMask(bytes calldata cleartexts, uint256 n) internal pure returns (uint8 mask) {
+        for (uint256 i = 0; i < n; ++i) {
+            uint256 value = uint256(bytes32(cleartexts[i * 32:(i + 1) * 32]));
+            if (value > 1) revert InvalidPaidFlag(i, value);
+            if (value == 1) mask |= uint8(1 << i);
+        }
+    }
 }

@@ -8,14 +8,22 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await hre.getNamedAccounts();
   const { deploy } = hre.deployments;
 
-  const deployed = await deploy("BluffDice", {
+  // Chip token first: the game takes its address in the constructor (token-agnostic IERC7984).
+  const chips = await deploy("BluffChips", {
     from: deployer,
-    args: [DEFAULT_BID_TIMEOUT],
+    args: [deployer],
     log: true,
   });
 
-  console.log(`BluffDice contract: `, deployed.address);
+  const game = await deploy("BluffDice", {
+    from: deployer,
+    args: [chips.address, DEFAULT_BID_TIMEOUT],
+    log: true,
+  });
+
+  console.log(`BluffChips contract: `, chips.address);
+  console.log(`BluffDice contract: `, game.address);
 };
 export default func;
 func.id = "deploy_bluffDice"; // id required to prevent reexecution
-func.tags = ["BluffDice"];
+func.tags = ["BluffDice", "BluffChips"];
