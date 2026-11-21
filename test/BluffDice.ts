@@ -11,8 +11,10 @@ import {
   Phase,
   STAKE,
   createTable,
+  PROOF_TIMEOUT,
   deployGame,
   fullTable,
+  startWithProof,
 } from "./helpers/fixtures";
 
 describe("BluffDice: tables, bids, timeout", function () {
@@ -38,7 +40,12 @@ describe("BluffDice: tables, bids, timeout", function () {
 
     it("reverts on a zero bid timeout", async function () {
       const factory = await ethers.getContractFactory("BluffDice");
-      await expect(factory.deploy(0)).to.be.revertedWithCustomError(game, "InvalidBidTimeout");
+      await expect(factory.deploy(await game.TOKEN(), 0)).to.be.revertedWithCustomError(game, "InvalidBidTimeout");
+    });
+
+    it("reverts InvalidToken on a zero token address", async function () {
+      const factory = await ethers.getContractFactory("BluffDice");
+      await expect(factory.deploy(ethers.ZeroAddress, BID_TIMEOUT)).to.be.revertedWithCustomError(game, "InvalidToken");
     });
   });
 
@@ -125,17 +132,25 @@ describe("BluffDice: tables, bids, timeout", function () {
     });
 
     for (const n of [2, 3, 4]) {
-      it(`the filling join of a ${n}-player table starts the game`, async function () {
+      it(`the filling join of a ${n}-player table requests the paid check; startGame then starts the game`, async function () {
         const players = signers.slice(0, n);
         const tableId = await createTable(game, players[0], n);
         for (const p of players.slice(1, -1)) await game.connect(p).joinTable(tableId);
 
-        const tx = await game.connect(players[n - 1]).joinTable(tableId);
-        await tx.wait();
+        // Phase C: the filling join no longer rolls dice, it makes the paid flags public.
+        const fill = await game.connect(players[n - 1]).joinTable(tableId);
+        await fill.wait();
+        const filledAt = BigInt(await time.latest());
+        await expect(fill)
+          .to.emit(game, "PaidCheckRequested")
+          .withArgs(tableId, filledAt + PROOF_TIMEOUT)
+          .and.not.to.emit(game, "GameStarted");
+        expect((await game.getTable(tableId)).phase).to.eq(Phase.AwaitingPaidProof);
+
+        const receipt = await startWithProof(game, tableId);
         const now = BigInt(await time.latest());
-        await expect(tx)
-          .to.emit(game, "GameStarted")
-          .withArgs(tableId, 1, 0, now + BID_TIMEOUT);
+        const started = receipt.logs.map((l) => game.interface.parseLog(l)).find((e) => e?.name === "GameStarted");
+        expect(started?.args).to.deep.eq([tableId, 1n, 0n, now + BID_TIMEOUT]);
 
         const t = await game.getTable(tableId);
         expect(t.phase).to.eq(Phase.Bidding);
@@ -171,7 +186,7 @@ describe("BluffDice: tables, bids, timeout", function () {
       await expect(game.connect(carol).joinTable(tableId))
         .to.emit(game, "PlayerJoined")
         .withArgs(tableId, carol.address, 1);
-      await expect(game.connect(dave).joinTable(tableId)).to.emit(game, "GameStarted");
+      await expect(game.connect(dave).joinTable(tableId)).to.emit(game, "PaidCheckRequested");
     });
 
     it("lets the creator leave; seat 0 reopens and its new owner bids first", async function () {
@@ -183,6 +198,7 @@ describe("BluffDice: tables, bids, timeout", function () {
       expect(await game.seatOf(tableId, carol.address)).to.eq(0);
       await game.connect(alice).joinTable(tableId); // fills the table at seat 2
       expect(await game.seatOf(tableId, alice.address)).to.eq(2);
+      await startWithProof(game, tableId);
       const t = await game.getTable(tableId);
       expect(t.phase).to.eq(Phase.Bidding);
       expect(t.players[t.turnSeat]).to.eq(carol.address);

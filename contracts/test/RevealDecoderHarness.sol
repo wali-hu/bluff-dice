@@ -16,4 +16,12 @@ contract RevealDecoderHarness {
     function countFace(bytes calldata cleartexts, uint256 n, uint8 face) external pure returns (uint8) {
         return RevealDecoder.countFace(cleartexts, n, face);
     }
+
+    /// @notice See `RevealDecoder.paidMask`.
+    /// @param cleartexts One 32-byte word per seat.
+    /// @param n Number of words to read.
+    /// @return Bit mask of the words equal to 1.
+    function paidMask(bytes calldata cleartexts, uint256 n) external pure returns (uint8) {
+        return RevealDecoder.paidMask(cleartexts, n);
+    }
 }

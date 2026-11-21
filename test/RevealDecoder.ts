@@ -54,4 +54,30 @@ describe("RevealDecoder", function () {
         .withArgs(index, value);
     });
   }
+
+  describe("paidMask (euint8 paid flags, 0 or 1)", function () {
+    for (const n of [2, 3, 4]) {
+      it(`n = ${n}: every combination of 0/1 words gives the matching bit mask`, async function () {
+        for (let mask = 0; mask < 1 << n; ++mask) {
+          const ws = Array.from({ length: n }, (_, i) => word((mask >> i) & 1));
+          expect(await decoder.paidMask(joinWords(ws), n)).to.eq(mask);
+        }
+      });
+    }
+
+    const badFlags: [string, bigint][] = [
+      ["2", 2n],
+      ["2^8 + 1 (high byte set, low byte is 1)", 2n ** 8n + 1n],
+      ["2^255 (top bit set)", 2n ** 255n],
+    ];
+    for (const [label, value] of badFlags) {
+      it(`a word of ${label} reverts InvalidPaidFlag(index, value) with exact arguments`, async function () {
+        const ws = [word(1), word(0), word(1), word(1)];
+        ws[2] = word(value);
+        await expect(decoder.paidMask(joinWords(ws), 4))
+          .to.be.revertedWithCustomError(decoder, "InvalidPaidFlag")
+          .withArgs(2, value);
+      });
+    }
+  });
 });

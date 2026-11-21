@@ -3,7 +3,7 @@ import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 import { ContractTransactionReceipt } from "ethers";
 import { ethers, fhevm } from "hardhat";
 
-import { BluffDice, BluffDice__factory } from "../../types";
+import { BluffChips, BluffChips__factory, BluffDice, BluffDice__factory } from "../../types";
 
 /** Mirrors `BluffDice.Phase`. */
 export enum Phase {
@@ -23,12 +23,56 @@ export const BID_TIMEOUT = 300n;
 export const STAKE = 600n;
 /** EIP-7825 per-transaction gas cap, enforced on Sepolia since Fusaka. */
 export const TX_GAS_CAP = 16_777_216n;
+/** `BluffChips.FAUCET_AMOUNT`: 1,000 chips at 6 decimals. */
+export const FAUCET_AMOUNT = 1_000_000_000n;
+/**
+ * `deployGame` gives signers[0..FUNDED_SIGNERS-1] faucet chips and an operator approval for the game.
+ * signers[FUNDED_SIGNERS..19] start with no chips (never-funded accounts) and no approval.
+ */
+export const FUNDED_SIGNERS = 12;
+/**
+ * Test-only operator expiry (max uint48 seconds). Tests jump hours ahead, so a short approval would expire
+ * mid-test. The frontend uses `now + 600` (SPEC R3); the expiry boundary itself is tested in BluffDiceStake.
+ */
+export const FOREVER = 2n ** 48n - 1n;
 
-export async function deployGame(bidTimeout: bigint = BID_TIMEOUT): Promise<BluffDice> {
+/** Deploys the chip token (owner signers[0]) and the game, then funds and approves the first `funded` signers. */
+export async function deployAll(
+  bidTimeout: bigint = BID_TIMEOUT,
+  funded: number = FUNDED_SIGNERS,
+): Promise<{ game: BluffDice; token: BluffChips }> {
+  const signers = await ethers.getSigners();
+  const tokenFactory = (await ethers.getContractFactory("BluffChips")) as BluffChips__factory;
+  const token = (await tokenFactory.deploy(signers[0].address)) as BluffChips;
+  await token.waitForDeployment();
   const factory = (await ethers.getContractFactory("BluffDice")) as BluffDice__factory;
-  const game = (await factory.deploy(bidTimeout)) as BluffDice;
+  const game = (await factory.deploy(await token.getAddress(), bidTimeout)) as BluffDice;
   await game.waitForDeployment();
-  return game;
+  for (const s of signers.slice(0, funded)) {
+    await (await token.connect(s).faucet()).wait();
+    await approve(token, game, s);
+  }
+  return { game, token };
+}
+
+/** Phase A/B entry point: same as `deployAll`, returns the game only (its token is `tokenOf(game)`). */
+export async function deployGame(bidTimeout: bigint = BID_TIMEOUT): Promise<BluffDice> {
+  return (await deployAll(bidTimeout)).game;
+}
+
+/** The chip token the game was deployed with. */
+export async function tokenOf(game: BluffDice): Promise<BluffChips> {
+  return BluffChips__factory.connect(await game.TOKEN(), ethers.provider);
+}
+
+/** `player` makes the game an operator of their chips until `until` (seconds). */
+export async function approve(
+  token: BluffChips,
+  game: BluffDice,
+  player: HardhatEthersSigner,
+  until: bigint = FOREVER,
+): Promise<void> {
+  await (await token.connect(player).setOperator(await game.getAddress(), until)).wait();
 }
 
 /** Creates a table with `players[0]` as creator; returns its id. */
@@ -43,22 +87,62 @@ export async function createTable(
   return tableId;
 }
 
+/** The KMS answer for a table's paid check: `fhevm.publicDecrypt(paidHandles)`, handles in seat order. */
+export async function paidProof(game: BluffDice, tableId: bigint) {
+  const handles = await game.paidHandles(tableId);
+  const r = await fhevm.publicDecrypt([...handles]);
+  return { handles: [...handles], ...r };
+}
+
+/** Fetches the paid-check proof and submits `startGame` (from `sender`, default signers[0]). */
+export async function startWithProof(
+  game: BluffDice,
+  tableId: bigint,
+  overrides: { gasLimit?: bigint } = {},
+  sender?: HardhatEthersSigner,
+): Promise<ContractTransactionReceipt> {
+  const p = await paidProof(game, tableId);
+  const g = sender ? game.connect(sender) : game;
+  return (await (await g.startGame(tableId, p.abiEncodedClearValues, p.decryptionProof, overrides)).wait())!;
+}
+
 /**
- * Creates a table of `players.length` seats and fills it. The last join rolls the dice.
- * Returns the table id and the receipt of the filling join.
+ * Creates a table of `players.length` seats, fills it (the last join requests the paid check) and submits
+ * the paid proof from `starter` (default signers[0]; all players are funded, so the dice are rolled). Returns the table id, the receipt of the
+ * filling join and the receipt of `startGame`.
  */
 export async function fullTable(
   game: BluffDice,
   players: HardhatEthersSigner[],
   overrides: { gasLimit?: bigint } = {},
-): Promise<{ tableId: bigint; fillReceipt: ContractTransactionReceipt }> {
+  starter?: HardhatEthersSigner,
+): Promise<{ tableId: bigint; fillReceipt: ContractTransactionReceipt; startReceipt: ContractTransactionReceipt }> {
   const tableId = await createTable(game, players[0], players.length);
   let fillReceipt: ContractTransactionReceipt | null = null;
   for (const p of players.slice(1)) {
     fillReceipt = await (await game.connect(p).joinTable(tableId, overrides)).wait();
   }
   if (!fillReceipt) throw new Error("fullTable needs at least 2 players");
-  return { tableId, fillReceipt };
+  const startReceipt = await startWithProof(game, tableId, overrides, starter);
+  return { tableId, fillReceipt, startReceipt };
+}
+
+/** Chip balance of `player`, user-decrypted as `reader` (default: the player) with contract = token. */
+export async function chipBalance(
+  token: BluffChips,
+  player: HardhatEthersSigner,
+  reader: HardhatEthersSigner = player,
+): Promise<bigint> {
+  const h = await token.confidentialBalanceOf(player.address);
+  if (h === ethers.ZeroHash) return 0n;
+  return fhevm.userDecryptEuint(FhevmType.euint64, h, await token.getAddress(), reader);
+}
+
+/** Chip balance of any address via the mock-only debugger (no ACL), e.g. the game's escrow. */
+export async function balanceOfAny(token: BluffChips, account: string): Promise<bigint> {
+  const h = await token.confidentialBalanceOf(account);
+  if (h === ethers.ZeroHash) return 0n;
+  return fhevm.debugger.decryptEuint(FhevmType.euint64, h);
 }
 
 /** Decrypts `player`'s dice as `reader` through the user-decryption flow (ACL enforced). */

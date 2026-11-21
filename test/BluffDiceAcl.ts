@@ -39,7 +39,7 @@ describe("BluffDice: dice ACL", function () {
     }
     game = await deployGame();
     gameAddress = await game.getAddress();
-    ({ tableId } = await fullTable(game, players)); // players[3] sends the rolling transaction
+    ({ tableId } = await fullTable(game, players, {}, players[3])); // players[3] sends startGame, which rolls
   });
 
   it("every player decrypts their own 5 dice, each in 1..6", async function () {
@@ -70,9 +70,9 @@ describe("BluffDice: dice ACL", function () {
     );
   });
 
-  it("ACL: each die is allowed to its owner and the game only, never to the filling joiner or others", async function () {
+  it("ACL: each die is allowed to its owner and the game only, never to the startGame sender or others", async function () {
     const acl = await aclOf(gameAddress);
-    const fillingJoiner = players[3]; // sender of the transaction that rolled every die
+    const fillingJoiner = players[3]; // sender of startGame, the transaction that rolled every die
     for (const owner of players) {
       for (const die of await game.diceOf(tableId, owner.address)) {
         expect(await acl.persistAllowed(die, owner.address)).to.eq(true);

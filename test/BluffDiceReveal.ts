@@ -18,6 +18,7 @@ import {
   fullTable,
   playToLiar,
   revealProof,
+  startWithProof,
 } from "./helpers/fixtures";
 
 /**
@@ -130,6 +131,7 @@ describe("BluffDice: Liar and reveal", function () {
         .withArgs(tableId, Phase.Bidding, Phase.Joining);
 
       await game.connect(players[1]).joinTable(tableId);
+      await startWithProof(game, tableId);
       await time.increase(BID_TIMEOUT + 1n);
       await game.claimTurnTimeout(tableId);
       await expect(game.connect(players[0]).callLiar(tableId))
@@ -344,6 +346,7 @@ describe("BluffDice: Liar and reveal", function () {
         .withArgs(joining, Phase.AwaitingReveal, Phase.Joining);
 
       await game.connect(players[1]).joinTable(joining);
+      await startWithProof(game, joining);
       await expect(game.finalizeReveal(joining, ...args))
         .to.be.revertedWithCustomError(game, "WrongPhase")
         .withArgs(joining, Phase.AwaitingReveal, Phase.Bidding);
@@ -387,6 +390,7 @@ describe("BluffDice: Liar and reveal", function () {
         .withArgs(tableId, Phase.Joining);
 
       await game.connect(players[1]).joinTable(tableId);
+      await startWithProof(game, tableId);
       await time.increase(BID_TIMEOUT + 1n);
       await expect(game.cancel(tableId))
         .to.be.revertedWithCustomError(game, "NotCancellable")
