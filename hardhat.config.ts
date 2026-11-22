@@ -11,6 +11,8 @@ import "solidity-coverage";
 
 import "./tasks/accounts";
 import "./tasks/D6Probe";
+import "./tasks/PlayRound";
+import "./tasks/SepoliaProbes";
 
 // Run 'npx hardhat vars setup' to see the list of variables that need to be set
 
@@ -31,9 +33,9 @@ const config: HardhatUserConfig = {
     deployer: 0,
   },
   etherscan: {
-    apiKey: {
-      sepolia: vars.get("ETHERSCAN_API_KEY", ""),
-    },
+    // A single string selects Etherscan's v2 multichain API in hardhat-verify 2.x; a per-network object would fall
+    // back to the retired v1 API.
+    apiKey: vars.get("ETHERSCAN_API_KEY", ""),
   },
   gasReporter: {
     currency: "USD",
