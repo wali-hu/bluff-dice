@@ -476,8 +476,7 @@ contract BluffDice is ZamaEthereumConfig, ReentrancyGuardTransient {
     /// @dev Allowed up to and including the turn deadline (same rule as `bid`), so it never overlaps with
     ///      `claimTurnTimeout`. FHE ops: 0 (no encrypted count, no ebool). HCU: 0.
     ///      ACL calls: maxPlayers * 5 `makePubliclyDecryptable` (4 players: 20).
-    ///      Gas (mock, gasUsed): 2 players 361,360; 3 players 519,825; 4 players 678,291 (about 31,700 per die);
-    ///      x3.2 Sepolia estimate for 4 players: 2.17M, 13% of the 16,777,216 per-tx cap.
+    ///      Gas: measured per player count on Sepolia, see the gas table in README.md.
     /// @param tableId Table id.
     function callLiar(uint256 tableId) external {
         Table storage t = _tableInPhase(tableId, Phase.Bidding);
