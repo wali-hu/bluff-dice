@@ -1,0 +1,547 @@
+{
+  "chainId": 11155111,
+  "game": "0x0456bAb0779697cCaB7125A0089b10eEEB0A8566",
+  "token": "0xd3F1dA18626e42E36b4a25e6765a932D40fe4E40",
+  "bidTimeout": 300,
+  "deployBlock": 12181547,
+  "deployTxs": [
+    {
+      "label": "deploy BluffChips",
+      "hash": "0xcaba3adb553d72218f9e5500e3646319fbd6bbcb8a374b8a4ff0ea09122a6715"
+    },
+    {
+      "label": "deploy BluffDice",
+      "hash": "0x2217fd65ea7662ea3c3b21b50c63e0874aa9f306a55f0edb12f5843f7f22a09e"
+    }
+  ],
+  "tables": [
+    {
+      "id": "R0",
+      "tableId": 1,
+      "players": 2,
+      "outcome": "cancel",
+      "fromBlock": 12183655,
+      "txs": [
+        {
+          "label": "faucet",
+          "hash": "0xed1587830448d13a60bfc8c2c80079c797d9b3823c7343be59dd7ec6889ebe81"
+        },
+        {
+          "label": "faucet",
+          "hash": "0x1d2ddd081b728f0c8d0398ac8d9e0929113faecda9b7cae502b49585e328a0a1"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0x0978e33a6f3fff70b5f4fac3e9f70f61dd0922bf351017293dfa266fdd909827"
+        },
+        {
+          "label": "createTable (2p)",
+          "hash": "0x74c5f393a17180bfb4bbb205a75abb6506b3e8f631e513a101d75caf85a9fb35"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0x523ff4a10fca948e9f89079ab01782130115b9e92e1ece7e5b95dc8f2078f6dc"
+        },
+        {
+          "label": "joinTable (filling)",
+          "hash": "0xd4477010a60a6dd5fd128370d0885432f4c91b9ae26a5033c54730ffe96bf90e"
+        },
+        {
+          "label": "cancel (2p, AwaitingPaidProof)",
+          "hash": "0x29752f35a9a2b7ef0dc8c4e8d5f873e117deb1d01b8b0e0f9c49ad661da5e6fb"
+        }
+      ]
+    },
+    {
+      "id": "R1",
+      "tableId": 2,
+      "players": 2,
+      "outcome": "caller-loses",
+      "fromBlock": 12183681,
+      "txs": [
+        {
+          "label": "faucet",
+          "hash": "0x2d0f7a25d1a7cbb634e91eafe0f816329cfa60acfc4591a9ee64965ba3566b67"
+        },
+        {
+          "label": "faucet",
+          "hash": "0x4251118f4b3e37823f75a9f43919bf981993db08205c97c34354f7154a75c158"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0xced245e3bd633cbdf45a7f38771a1bd441c6810d4a69633660e40a8a973cce14"
+        },
+        {
+          "label": "createTable (2p)",
+          "hash": "0x867375270a0d82a9b9d7d0644e2a9510808899941e02365d95dd40035d527715"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0x55991ab1962073afeaff7d3050b2902977ceb732302302d2a1704efcad7ad3bf"
+        },
+        {
+          "label": "joinTable (filling)",
+          "hash": "0xe667a4059135b525d70dcdc7e352cc733b40f3b1f7ce025cf12cc261e325411d"
+        },
+        {
+          "label": "startGame (2p)",
+          "hash": "0xe0fc4a43af57a13a4c89201707498862a06ca1fb1d5bf3dcd551c69d14ebad2f"
+        },
+        {
+          "label": "bid",
+          "hash": "0xde169cbf55fe4d0d716b46e9f65e67d9b78250be4211aa1df840897e0bba728f"
+        },
+        {
+          "label": "bid",
+          "hash": "0x7602f3f642ccd42a4a91557030b55ed7414b91a218f8b3892edc710d9d968c0d"
+        },
+        {
+          "label": "callLiar (2p)",
+          "hash": "0x5e3056879acc482e6a4eae2ccd4b98fccbf6d3ef656708c266f60ac4513ab885"
+        },
+        {
+          "label": "finalizeReveal (2p)",
+          "hash": "0xc5679bff26ec881138278c1d3cc88c7ade764575909591288faa7a8e6dfdb39f"
+        }
+      ]
+    },
+    {
+      "id": "R2a",
+      "tableId": 3,
+      "players": 4,
+      "outcome": "timeout (runner aborted after the fill; pushed by finalize-round.ts)",
+      "fromBlock": 12184010,
+      "txs": [
+        {
+          "label": "faucet",
+          "hash": "0xc82b3544a4ba9fcedf088c14be561b6f2ff219fcff8229f29cf56fa4813762da"
+        },
+        {
+          "label": "faucet",
+          "hash": "0xfdaefd4589a738b4ad88c76a237b93656ac800f6682b2d6abcdc19c4f02dba37"
+        },
+        {
+          "label": "faucet",
+          "hash": "0x8bf260e87d79f96cc42f2682bafcadafab485b5b79062ae5e27027039a88bf41"
+        },
+        {
+          "label": "faucet",
+          "hash": "0x37bf1e3077cba0ac795c2a1411fe7e01afcf34bf352c6a1548b266bbab3ba780"
+        },
+        {
+          "label": "mint",
+          "hash": "0xcf579e04bbfe89d1b5991405cad9508098dc0f197c157aa4bab7d846da44beef"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0xc0e937428f9baf87174dbfc08c31f279f137e13eac5e8b76b9307d7dc1ee0b8e"
+        },
+        {
+          "label": "createTable (4p)",
+          "hash": "0x762eb7fbf74ae1db4cbd613be0a38c332913088758e462360477d00cbf364102"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0xc7fa9804ffb2f50d286f4d9a89f5214c4310c7e8b7fd1bfaa6889d62a269f1dd"
+        },
+        {
+          "label": "joinTable",
+          "hash": "0x0e7c2702a432b4cbc1001f2d8992721148a15c40b64efae68bbcc071f7cc0566"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0x75c4739333f0ebf80744e9740cf4f693e88c5efa95441a6f6450150dc17f10bc"
+        },
+        {
+          "label": "joinTable",
+          "hash": "0x2f7c317b1e9efb3db85a96f52571fed1110037d2c76b927559883096ba61e6c5"
+        },
+        {
+          "label": "leaveTable",
+          "hash": "0x437bc21cd29324e3b2b88fabd0af281e68b7926110173f2c371a2e4bd636551c"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0xa4fc92ed4eb2895f03f140d52c05a5db500bc291009d446c8ff542b6c4b4b731"
+        },
+        {
+          "label": "joinTable (never-funded)",
+          "hash": "0xc82365576ac25d5e6c8b621fa8407343105f8d66f99af99ef3c0ec5c4234de7f"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0xe435590a04ece2e5b181a910da0d2f676c328d40095f67eccec1e320b76d6b75"
+        },
+        {
+          "label": "leaveTable (never-funded)",
+          "hash": "0x13ece98e6145457d61b4de8d4f0b064ff9708367984192327bf31e58bb02d68e"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0x5be7a565ed8a28149fddeb0c280c30042826aa088be2e3a49dfb729da261020a"
+        },
+        {
+          "label": "joinTable",
+          "hash": "0xc638c06799bbfd7a22803286854891371f93f6e20cb33654ba2a0167543f9063"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0x993d20b69b82e7affa52a167d409e644275b02cef6bfd0b5cda19919114ec748"
+        },
+        {
+          "label": "joinTable (filling)",
+          "hash": "0xd826e4bcfc07eecde7df008fbda298f5752a6d453fbd178a0506b07afb7e2e64"
+        },
+        {
+          "label": "startGame (4p)",
+          "hash": "0x499aaf036044fea8dd3c1adf4da71b60a2926821bb9cd584db099f1e79d44b44"
+        },
+        {
+          "label": "claimTurnTimeout (4p)",
+          "hash": "0x1631df78e0b9ee2e6cbd26b9ceb16ea4b336b6decee2f60955a9cadc451668e6"
+        }
+      ]
+    },
+    {
+      "id": "R2b",
+      "tableId": 4,
+      "players": 4,
+      "outcome": "cancel (runner aborted after the fill: stale RPC read; cancelled after the proof deadline)",
+      "fromBlock": 12186507,
+      "txs": [
+        {
+          "label": "createTable (4p)",
+          "hash": "0xd339dec403d52d1c21ab63ce2454231704ba3a746c96e51e041a40616645b6b3"
+        },
+        {
+          "label": "joinTable",
+          "hash": "0x7175e5c684b76efd6cc770794605d3a02e2753cdf2409fbe20e877c66e20e6f0"
+        },
+        {
+          "label": "joinTable",
+          "hash": "0x6009c8105bf8f146c64f7469c4c98667769b24ab37dde6299892c17a7c44b260"
+        },
+        {
+          "label": "leaveTable",
+          "hash": "0xd456dc219862dede235b10e174ef971fb3dd8aa53e69906947ad6ee0f5191887"
+        },
+        {
+          "label": "joinTable (never-funded)",
+          "hash": "0xcfb7855e44746046da05de14fcbb34d91b9175410b8eb4f101738b2484c1dffb"
+        },
+        {
+          "label": "leaveTable (never-funded)",
+          "hash": "0x8ba10202b1ed20848080175a4cd17f1067c17be20bef4c380bf876a3480a25a7"
+        },
+        {
+          "label": "joinTable",
+          "hash": "0xbd1b4ead1eac020e77fd7008673312d0b03a73968b4a89fb6e85a9337bdc45bd"
+        },
+        {
+          "label": "joinTable (filling)",
+          "hash": "0x6f3d2a98b4d5ddebf8e23f7d3ba09af118110e4ef160a269b94fe1f9e7625e55"
+        },
+        {
+          "label": "cancel (4p, AwaitingPaidProof)",
+          "hash": "0x8e4d635a605a927efe55341dc954bf5d0a2a329522522e67d143c5b197d43dbf"
+        }
+      ]
+    },
+    {
+      "id": "R2",
+      "tableId": 5,
+      "players": 4,
+      "outcome": "bidder-loses",
+      "fromBlock": 12186546,
+      "txs": [
+        {
+          "label": "faucet",
+          "hash": "0xd4f188f7116fa62590a92cbca011569f4223c845dd8dc3aeb80086803de69a4d"
+        },
+        {
+          "label": "faucet",
+          "hash": "0x11cb73da22de2f043bda643005e70fa8948027c6ff8a329cc8161fa98ac73dc9"
+        },
+        {
+          "label": "faucet",
+          "hash": "0x65b5b89d877ff5f2b8e289463c3f06832fb3ac7775334389fd9040e95b0a371b"
+        },
+        {
+          "label": "faucet",
+          "hash": "0x59ab9a630996575a5f292b729a99d194a00f2c9a24aeb5df413317b98106b34c"
+        },
+        {
+          "label": "mint",
+          "hash": "0x23bcba08d8c9b4f5221f2813965f4e25f704a573e3eb3208162c5aec2d1c4530"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0xb9bff4adafe777b6bd2f3cca7a0e97c464c58d54ad4e8bc873cbd95435046443"
+        },
+        {
+          "label": "createTable (4p)",
+          "hash": "0xe620805f732d67bbea50b79ece986b65647ad9b000e91023ed01ede7e643494e"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0x824c1d78c2e301c8149efddc1f5839383ea73e00abc58419da3444a1f92a4157"
+        },
+        {
+          "label": "joinTable",
+          "hash": "0x5a79ecea214d8e573f4d597ae7b6ab54497533cc447f24057e368c793f9537ef"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0x6ab7935d68f1e50088be10f5e75bf9a0baaadae31db11312fa27968d540df43e"
+        },
+        {
+          "label": "joinTable",
+          "hash": "0x93692201f434cb75a767245d42adb78e7deb2d48f8c5a17a17ef90db5358da78"
+        },
+        {
+          "label": "leaveTable",
+          "hash": "0x3e36b2648438575eb532b6a03b78ad8428b1094ec240e00903b692dfb10318de"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0x67f243f61909bd52323bd0a9f32fe40ffa7789ae2e5f7cfd670056ea14ceb654"
+        },
+        {
+          "label": "joinTable (never-funded)",
+          "hash": "0xca06ea02ad776194fabd42f0c29b5df972eb58cc5cbbddbb18f2c5ed57be137d"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0x26d0d7c4c5f5ebdb0bd2808bbd65ed025d2235d188ca6f06727ee7a87ddb253a"
+        },
+        {
+          "label": "leaveTable (never-funded)",
+          "hash": "0x4d0c44854eb40dfe2ac63f531d0aa4bd024618b04a53525ebe95b8a0ff3ef44f"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0xb0f030811f8b32a23a610c6605d9d2843a499c79898f3f03ec516f954dc62281"
+        },
+        {
+          "label": "joinTable",
+          "hash": "0x98fe9772cba6e6f7f54a1144b1088788caede3a11274b56d88233b6b589c1210"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0x3c72df859723b2108d5fb705615326e2a200e014b79b02689dd64dff83277bda"
+        },
+        {
+          "label": "joinTable (filling)",
+          "hash": "0xf5f187d88b30190ee5e2c710df2f35dae160769724d432946a5e937ad9aad274"
+        },
+        {
+          "label": "startGame (4p)",
+          "hash": "0x95db6ef854e098ced7541d7f0386198b5761b39de9d76737c2582e1bec4f210d"
+        },
+        {
+          "label": "bid",
+          "hash": "0x8130ed81697d0f2ddbc357aed525cf89a9cb518082567b9a579cf77a6bcada30"
+        },
+        {
+          "label": "bid",
+          "hash": "0x2c446f1117e9313891115ec6812339f910f2a68e49e8e38b9f2ce9836533276f"
+        },
+        {
+          "label": "callLiar (4p)",
+          "hash": "0x332a05fd7b3f1f5182278675dded72ea9e4aaafb2b2c742e3771f22236e19ad1"
+        },
+        {
+          "label": "finalizeReveal (4p)",
+          "hash": "0xec92febb42ad51987707febd5c446522972b1422a21769f996bfe0f982247eff"
+        }
+      ]
+    },
+    {
+      "id": "R3",
+      "tableId": 6,
+      "players": 2,
+      "outcome": "timeout",
+      "fromBlock": 12186586,
+      "txs": [
+        {
+          "label": "faucet",
+          "hash": "0x291963158eb4a2451b27987c30289de3ec1770317a6f425a6c9720c5731687fa"
+        },
+        {
+          "label": "faucet",
+          "hash": "0xb8903e1c29e5e0063a0a1332f5c2cb06dbce3124cafb7766accc643412c4a9ab"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0xbd3cd61fcfec59a175b93bb865af3e6726c191c9a8f37b232d7d516ed2de56d1"
+        },
+        {
+          "label": "createTable (2p)",
+          "hash": "0x20aa1883eee0a6288c5c54be3d999f6759b08f3bcfa4920f4eb3db0f63a8ebe4"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0x83e9a8bcb12882765648e587fc50b932bcebfc42e744760bab5cc49c89ca53ef"
+        },
+        {
+          "label": "joinTable (filling)",
+          "hash": "0x2a94e51eb607eaecf1bfff76df66ab5305f532710f8771c124b5f3f3d4d5a5da"
+        },
+        {
+          "label": "startGame (2p)",
+          "hash": "0xee6660adeb85fd1e792223d7b6ada8ffa96ef9d5ec85c94374dd2d0eb1297fd7"
+        },
+        {
+          "label": "claimTurnTimeout (2p)",
+          "hash": "0x4e83c2423b39b808b77fcb0c6737eb3472d41f828b74ab2bc2b37739b3768195"
+        }
+      ]
+    },
+    {
+      "id": "R4a",
+      "tableId": 7,
+      "players": 4,
+      "outcome": "timeout (runner hung after a machine suspend; settled by finalize-round.ts)",
+      "fromBlock": 12186633,
+      "txs": [
+        {
+          "label": "faucet",
+          "hash": "0x66b4f1fbe8db583c46f0cd8ad4973e6ccd01a191a40a935413e7328f76f7dbf1"
+        },
+        {
+          "label": "faucet",
+          "hash": "0x4f6cadbb662ec921c4b12952eaa84ffa0e7ad62438b2cc53d66af85dae6bdcce"
+        },
+        {
+          "label": "faucet",
+          "hash": "0xfb8a6adba79e7be3f18f1ce642fb6726f2b81aa8ed95b9d1eebf021263ab14ea"
+        },
+        {
+          "label": "faucet",
+          "hash": "0x703ba18434b0c93fc5540a21ed0e45ecd42167c4e3c1ec9dd708c43bf6706b04"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0xf9d2ff17b8a7c14acd55ef42325002b633d9779dfde0f7fb6388106d3e9ea95a"
+        },
+        {
+          "label": "createTable (4p)",
+          "hash": "0x8424c66e519a369a64d9dabcfaac8c9abc20229f65d1f8494575d61f7dee8a2d"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0x7da624618eec7cdd62191b84227030f41cca5cc1e526eadae923d58fa10b7361"
+        },
+        {
+          "label": "joinTable",
+          "hash": "0x4792b2e77d85f934eeeebcaec1cfc372870df7ead4b681792bdb065f1b6c3aad"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0xabc2c3f94672a78779d91e98251347fd9635d05ba510989922a463eec6f9446e"
+        },
+        {
+          "label": "joinTable",
+          "hash": "0x482197b88bf634211e74460917164f8fb282ff4b3b0073cab15d82c79e01ed06"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0x1143eb866a7877e2591ff4572bd8a5b93cdc80a6040527f30ae092eaf5a1e58d"
+        },
+        {
+          "label": "joinTable (filling)",
+          "hash": "0xacafbcef9620b5d68f31004639aed342cb00160910e800ac55f6b5ee7df6b340"
+        },
+        {
+          "label": "startGame (4p)",
+          "hash": "0x3a56f069dd9ed4ce6f060b47f7ba6f1b467f5428c5af0a018e783adc9e5bbeb6"
+        },
+        {
+          "label": "bid",
+          "hash": "0x58f92584f52894858f3072607d8fadbf6ff7a93e07e3256e0c3728892a6a9d4c"
+        },
+        {
+          "label": "claimTurnTimeout (4p)",
+          "hash": "0x5c7797be52128e62a8c6a13022424f469237ee4d685b1ca3db527fdca535ba5f"
+        }
+      ]
+    },
+    {
+      "id": "R4",
+      "tableId": 8,
+      "players": 4,
+      "outcome": "caller-loses",
+      "fromBlock": 12186851,
+      "txs": [
+        {
+          "label": "faucet",
+          "hash": "0xc2f6b0cd653f8ada3f4b2ad6fcaf1a185c84bf86c617ec9c69817ccea21649d2"
+        },
+        {
+          "label": "faucet",
+          "hash": "0x6ca36819d5504e3330f73c9454dedce2186934214c5a429ac022a1beef8ecd98"
+        },
+        {
+          "label": "faucet",
+          "hash": "0x039f60999214c7c356a7d27f5e6e7fe45335eb07949044de73984610e3c13fab"
+        },
+        {
+          "label": "faucet",
+          "hash": "0x5944b28b14d5b01916ea176c19d9ebd44ca2d126d872a9cc7a6a17d60236e91b"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0xa76263b72eb0a926b972359677b75f57b8fee9d28d0c442b4ee28db0bfbef6e3"
+        },
+        {
+          "label": "createTable (4p)",
+          "hash": "0x058ccf82d061f1b53e8c379017830577157f48e65b47932a7137ee3e8e6e27b3"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0xf657e3232314e86e3c257972b9b410922f3c1952f3164ceadaed6f0ead4d6aa4"
+        },
+        {
+          "label": "joinTable",
+          "hash": "0x69c29af93981ecd87d446aafb7d8cf55df557d2c15bb4b7ea8bf4f6bfce44d32"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0xacdf98b11c461c9fb3a13ad0d451770b0f7c43d406e5f2b0ddd6718777da2798"
+        },
+        {
+          "label": "joinTable",
+          "hash": "0x381657368c495e4c9cdfc046b22382fdd098df007a0f2be8ffdd18a844bf6616"
+        },
+        {
+          "label": "setOperator",
+          "hash": "0x6f292f7d2af68808fe78612fa5cb715ffd8ad7d77cc5a17ce625dacf848e7554"
+        },
+        {
+          "label": "joinTable (filling)",
+          "hash": "0x21baad71940c79565eb412c1702d7c953f25b4752affb62ef909173ceea678be"
+        },
+        {
+          "label": "startGame (4p)",
+          "hash": "0x1e82e07a2084382ed550d66b98e89e66c563ea3682a35772a5adc3d8b177e9ca"
+        },
+        {
+          "label": "bid",
+          "hash": "0xcf3e0cb2c537d1067ad6fcb0c06c129e0ce2dc81fcdae247d6cbf53abe87a3d5"
+        },
+        {
+          "label": "bid",
+          "hash": "0x7475b1f1d8b58036297150a21b357c36089328cdcdab5f39999e364244f81caf"
+        },
+        {
+          "label": "callLiar (4p)",
+          "hash": "0xa02b0bf9df236c6c51982dace2fdf2afa3afde1f2a92af8909d964a4629a69b3"
+        },
+        {
+          "label": "finalizeReveal (4p)",
+          "hash": "0x9eee8ab4480c6db5f22666cffda854c5b31523965e99605883a9738b219adbfd"
+        }
+      ]
+    }
+  ]
+}
