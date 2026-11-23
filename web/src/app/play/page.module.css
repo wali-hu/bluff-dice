@@ -1,0 +1,25 @@
+.intro {
+  padding-block: 32px 8px;
+}
+
+.title {
+  font-size: clamp(2rem, 6vw, 2.8rem);
+}
+
+.lead {
+  color: var(--bone-muted);
+  font-size: 1.05rem;
+}
+
+.card {
+  margin-top: 16px;
+  padding: 18px var(--gutter);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--slate);
+}
+
+.cardTitle {
+  font-size: 1.2rem;
+  margin: 0;
+}

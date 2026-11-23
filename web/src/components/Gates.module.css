@@ -1,0 +1,33 @@
+.banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  margin-top: 16px;
+  padding: 14px var(--gutter);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--brass);
+  border-radius: var(--radius);
+  background: var(--slate);
+}
+
+.text {
+  flex: 1 1 260px;
+}
+
+.title {
+  margin: 0 0 2px;
+  font-weight: 600;
+  color: var(--bone);
+}
+
+.body {
+  margin: 0;
+  color: var(--bone-muted);
+  font-size: 0.95rem;
+}
+
+.action {
+  flex: none;
+}

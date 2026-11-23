@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { ConnectButton } from "./ConnectButton";
 import { NavLinks } from "./NavLinks";
 import styles from "./SiteHeader.module.css";
 
@@ -10,7 +11,12 @@ export function SiteHeader() {
         <Link href="/" className={styles.wordmark} aria-label="Bluff, home">
           Bluff
         </Link>
-        <NavLinks />
+        <div className={styles.nav}>
+          <NavLinks />
+        </div>
+        <div className={styles.connect}>
+          <ConnectButton />
+        </div>
       </div>
     </header>
   );

@@ -1,23 +1,29 @@
+/* Mobile: wordmark + connect on the first row, nav on the second. Desktop: one row. */
 .header {
   border-bottom: 1px solid var(--line);
   background: var(--ink);
 }
 
 .inner {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "brand connect"
+    "nav nav";
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  min-height: 60px;
+  column-gap: 12px;
+  padding-block: 8px 4px;
 }
 
 .wordmark {
+  grid-area: brand;
   font-family: var(--font-display);
   font-size: 1.6rem;
   font-weight: 700;
   letter-spacing: 0.01em;
   color: var(--bone);
   text-decoration: none;
+  justify-self: start;
 }
 
 .wordmark::after {
@@ -26,6 +32,15 @@
 }
 
 .nav {
+  grid-area: nav;
+  margin-left: -12px;
+}
+
+.connect {
+  grid-area: connect;
+}
+
+.navList {
   display: flex;
   gap: 4px;
   margin: 0;
@@ -48,4 +63,18 @@
 
 .navLink[aria-current="page"] {
   color: var(--brass);
+}
+
+@media (min-width: 640px) {
+  .inner {
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: "brand nav connect";
+    min-height: 64px;
+    padding-block: 0;
+  }
+
+  .nav {
+    margin-left: 0;
+    justify-self: end;
+  }
 }

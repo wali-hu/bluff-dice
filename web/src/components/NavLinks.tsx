@@ -14,7 +14,7 @@ export function NavLinks() {
   const pathname = usePathname();
   return (
     <nav aria-label="Main">
-      <ul className={styles.nav}>
+      <ul className={styles.navList}>
         {LINKS.map((link) => {
           const current = pathname === link.href;
           return (

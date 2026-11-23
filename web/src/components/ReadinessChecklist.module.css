@@ -1,0 +1,37 @@
+.list {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.done,
+.todo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.done {
+  color: var(--bone);
+}
+
+.todo {
+  color: var(--bone-muted);
+}
+
+.mark {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  font-size: 0.85rem;
+}
+
+.done .mark {
+  border-color: var(--verdigris);
+  color: var(--verdigris);
+}

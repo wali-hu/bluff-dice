@@ -2,9 +2,11 @@ import type { Metadata, Viewport } from "next";
 import { Fraunces, IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 
 import { Disclaimer } from "@/components/Disclaimer";
+import { ConnectedGates } from "@/components/Gates";
 import { SiteHeader } from "@/components/SiteHeader";
 
 import "./globals.css";
+import { Providers } from "./Providers";
 
 // next/font downloads the font files at build time and serves them from this app (no runtime Google request).
 const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-fraunces", display: "swap" });
@@ -40,11 +42,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <a className="skip-link" href="#main">
           Skip to content
         </a>
-        <SiteHeader />
-        <main id="main" tabIndex={-1}>
-          {children}
-        </main>
-        <Disclaimer />
+        <Providers>
+          <SiteHeader />
+          <ConnectedGates />
+          <main id="main" tabIndex={-1}>
+            {children}
+          </main>
+          <Disclaimer />
+        </Providers>
       </body>
     </html>
   );
