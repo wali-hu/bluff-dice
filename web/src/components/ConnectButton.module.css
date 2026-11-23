@@ -45,12 +45,21 @@
   justify-content: flex-start;
 }
 
-.error {
+.error,
+.info {
   position: absolute;
   right: 0;
   top: calc(100% + 6px);
   margin: 0;
   white-space: nowrap;
   font-size: 0.8rem;
+}
+
+.error {
   color: var(--ember);
+}
+
+/* Not a failure: a wallet prompt is open or about to be (waiting, request already pending). */
+.info {
+  color: var(--bone-muted);
 }

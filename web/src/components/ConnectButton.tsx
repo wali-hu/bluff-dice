@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useConnect, useConnection, useConnectors, useDisconnect, type Connector } from "wagmi";
 
+import { connectView } from "@/chain/connectState";
 import { useHasInjectedWallet, useMounted } from "@/chain/useWalletGate";
 import { METAMASK_DOWNLOAD_URL } from "@/config/links";
 
@@ -82,6 +83,7 @@ export function ConnectButton() {
   }
 
   const busy = status === "connecting" || status === "reconnecting" || connect.isPending;
+  const view = connectView({ pending: busy, error: connect.error });
   const onlyOne = connectors.length === 1 ? connectors[0] : undefined;
 
   return (
@@ -94,7 +96,7 @@ export function ConnectButton() {
         aria-controls={onlyOne ? undefined : "wallet-menu"}
         onClick={() => (onlyOne ? connect.mutate({ connector: onlyOne }) : setOpen((v) => !v))}
       >
-        {busy ? "Check your wallet…" : "Connect wallet"}
+        {busy ? "Waiting for wallet…" : "Connect wallet"}
       </button>
       {open && !onlyOne ? (
         <ul id="wallet-menu" className={styles.menu} aria-label="Choose a wallet">
@@ -114,13 +116,15 @@ export function ConnectButton() {
           ))}
         </ul>
       ) : null}
-      {connect.error ? (
-        <p className={styles.error} role="status">
-          {connect.error.name === "UserRejectedRequestError"
-            ? "Connection cancelled."
-            : "Could not connect. Try again."}
+      {view.kind === "idle" ? null : (
+        <p
+          className={view.kind === "rejected" || view.kind === "failed" ? styles.error : styles.info}
+          role="status"
+          aria-live="polite"
+        >
+          {view.message}
         </p>
-      ) : null}
+      )}
     </div>
   );
 }
