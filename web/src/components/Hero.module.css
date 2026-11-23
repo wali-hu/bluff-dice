@@ -4,6 +4,49 @@
   padding-block: 40px 24px;
 }
 
+.eyebrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-bottom: 14px;
+}
+
+.players {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+.live {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 4px 12px;
+  border: 1px solid rgb(63 163 140 / 45%);
+  border-radius: 999px;
+  background: var(--slate);
+  color: var(--verdigris);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.live:hover {
+  border-color: var(--verdigris);
+}
+
+.liveDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--verdigris);
+  box-shadow: 0 0 0 3px rgb(63 163 140 / 25%);
+}
+
 .title {
   font-size: clamp(2rem, 7vw, 3.4rem);
   margin-bottom: 16px;
@@ -40,12 +83,6 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--brass);
-}
-
-.dice {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
 }
 
 .caption {

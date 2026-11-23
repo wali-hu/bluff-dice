@@ -1,5 +1,10 @@
+import { MAX_PLAYERS, MIN_PLAYERS } from "@/config/game";
+import { etherscanAddressUrl } from "@/config/links";
+import { BLUFF_DICE_ADDRESS } from "@/contracts/addresses";
+
 import { BoneDie } from "./BoneDie";
 import { CipherDie } from "./CipherDie";
+import { DiceRow } from "./DiceRow";
 import styles from "./Hero.module.css";
 
 const OPPONENT_SEEDS = [11, 23, 37, 41, 59] as const;
@@ -9,6 +14,21 @@ export function Hero() {
   return (
     <section className={styles.hero} aria-labelledby="hero-title">
       <div className={styles.copy}>
+        <div className={styles.eyebrow}>
+          <span className={styles.players}>
+            Bluffing for {MIN_PLAYERS}–{MAX_PLAYERS} players
+          </span>
+          <a
+            className={styles.live}
+            href={etherscanAddressUrl(BLUFF_DICE_ADDRESS)}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span className={styles.liveDot} aria-hidden="true" />
+            Live on Sepolia
+            <span className="visually-hidden"> (BluffDice contract on Etherscan, opens in a new tab)</span>
+          </a>
+        </div>
         <h1 id="hero-title" className={styles.title}>
           Liar&apos;s Dice, with a cup made of encryption.
         </h1>
@@ -20,17 +40,17 @@ export function Hero() {
       <figure className={styles.table}>
         <div className={styles.row}>
           <span className={styles.rowLabel}>Their cup</span>
-          <div className={styles.dice}>
+          <DiceRow label="Their cup: 5 hidden dice">
             {OPPONENT_SEEDS.map((seed) => (
-              <CipherDie key={seed} seed={seed} size="sm" />
+              <CipherDie key={seed} seed={seed} />
             ))}
-          </div>
+          </DiceRow>
         </div>
         <div className={styles.row}>
           <span className={styles.rowLabel}>Your die</span>
-          <div className={styles.dice}>
+          <DiceRow label="Your die">
             <BoneDie face={5} />
-          </div>
+          </DiceRow>
         </div>
         <figcaption className={styles.caption}>
           Hidden dice show random noise, not real data. Each die can be decrypted only by its owner.

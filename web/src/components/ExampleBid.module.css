@@ -31,18 +31,17 @@
   color: var(--brass);
 }
 
-.dice {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
 .bidLine {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 12px;
   min-height: 52px;
+}
+
+.waiting {
+  color: var(--bone-muted);
+  font-style: italic;
 }
 
 .bidChip {

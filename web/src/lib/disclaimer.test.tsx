@@ -16,6 +16,6 @@ describe("disclaimer", () => {
     expect(html).toContain(`>${DISCLAIMER}<`);
     expect(html).toContain(`https://sepolia.etherscan.io/address/${BLUFF_DICE_ADDRESS}`);
     expect(html).toContain(`https://sepolia.etherscan.io/address/${BLUFF_CHIPS_ADDRESS}`);
-    expect(html).toContain("https://github.com/wali-hu/liars-dice-kit");
+    expect(html).toContain("https://github.com/wali-hu/bluff-dice");
   });
 });

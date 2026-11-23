@@ -14,13 +14,12 @@ interface CipherDieProps {
   seed: number;
   /** Re-scramble the glyphs (skipped when the user prefers reduced motion). */
   animate?: boolean;
-  size?: "md" | "sm";
 }
 
 /**
  * A hidden die. The glyphs are random noise that only suggests ciphertext; they are not the die's handle.
  */
-export function CipherDie({ seed, animate = true, size = "md" }: CipherDieProps) {
+export function CipherDie({ seed, animate = true }: CipherDieProps) {
   const [glyphs, setGlyphs] = useState(() => glyphNoise(GLYPHS_PER_DIE, seededRandom(seed)));
 
   useEffect(() => {
@@ -43,7 +42,7 @@ export function CipherDie({ seed, animate = true, size = "md" }: CipherDieProps)
     <span
       role="img"
       aria-label="Hidden die: encrypted, only its owner can read it"
-      className={`${styles.die} ${styles.cipher} ${size === "sm" ? styles.sm : ""}`}
+      className={`${styles.die} ${styles.cipher}`}
     >
       {glyphs.map((glyph, i) => (
         <span key={i} className={styles.glyph} aria-hidden="true">

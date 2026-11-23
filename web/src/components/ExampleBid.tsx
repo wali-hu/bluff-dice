@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { BoneDie } from "./BoneDie";
 import { CipherDie } from "./CipherDie";
+import { DiceRow } from "./DiceRow";
 import styles from "./ExampleBid.module.css";
 
 const YOUR_DICE = [2, 4, 4, 6, 1] as const;
@@ -47,35 +48,37 @@ export function ExampleBid() {
       <div className={styles.board}>
         <div className={styles.row}>
           <span className={styles.label}>Their cup</span>
-          <div className={styles.dice}>
+          <DiceRow label={revealed ? "Their cup, revealed" : "Their cup: 5 hidden dice"}>
             {THEIR_DICE.map((face, i) =>
               revealed ? (
-                <BoneDie key={i} face={face} size="sm" lit={face === BID.face} />
+                <BoneDie key={i} face={face} lit={face === BID.face} />
               ) : (
-                <CipherDie key={i} seed={THEIR_SEEDS[i] ?? i} size="sm" />
+                <CipherDie key={i} seed={THEIR_SEEDS[i] ?? i} />
               ),
             )}
-          </div>
+          </DiceRow>
         </div>
 
-        <div className={styles.bidLine} aria-hidden={!showBid}>
+        <div className={styles.bidLine}>
           {showBid ? (
             <>
               <span className={styles.bidChip}>
-                Bid: {BID.quantity} × <BoneDie face={BID.face} size="sm" />
+                Bid: {BID.quantity} × <BoneDie face={BID.face} size="chip" />
               </span>
               {called ? <span className={styles.liar}>LIAR!</span> : null}
             </>
-          ) : null}
+          ) : (
+            <span className={styles.waiting}>Waiting for the first bid…</span>
+          )}
         </div>
 
         <div className={styles.row}>
           <span className={styles.label}>Your cup</span>
-          <div className={styles.dice}>
+          <DiceRow label="Your cup">
             {YOUR_DICE.map((face, i) => (
-              <BoneDie key={i} face={face} size="sm" lit={(called || revealed) && face === BID.face} />
+              <BoneDie key={i} face={face} lit={(called || revealed) && face === BID.face} />
             ))}
-          </div>
+          </DiceRow>
         </div>
       </div>
 

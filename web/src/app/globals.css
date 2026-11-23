@@ -143,6 +143,8 @@ code,
   background: var(--slate);
   color: var(--bone-muted);
   border-color: var(--line);
+  /* Disabled controls are exempt from WCAG contrast; the reason is always given in full-contrast text nearby. */
+  opacity: 0.55;
   cursor: not-allowed;
 }
 
