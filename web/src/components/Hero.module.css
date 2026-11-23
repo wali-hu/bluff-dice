@@ -1,0 +1,62 @@
+.hero {
+  display: grid;
+  gap: 32px;
+  padding-block: 40px 24px;
+}
+
+.title {
+  font-size: clamp(2rem, 7vw, 3.4rem);
+  margin-bottom: 16px;
+}
+
+.lead {
+  font-size: 1.15rem;
+  color: var(--bone);
+  max-width: 34ch;
+}
+
+.liar {
+  color: var(--ember);
+  font-weight: 600;
+}
+
+.table {
+  margin: 0;
+  padding: 20px var(--gutter);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: radial-gradient(120% 90% at 50% 0%, #1f2838 0%, var(--ink) 75%);
+}
+
+.row {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.rowLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+.dice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.caption {
+  font-size: 0.85rem;
+  color: var(--bone-muted);
+}
+
+@media (min-width: 820px) {
+  .hero {
+    grid-template-columns: 1.1fr 1fr;
+    align-items: center;
+    padding-block: 72px 40px;
+  }
+}

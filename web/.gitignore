@@ -1,0 +1,23 @@
+# dependencies
+/node_modules
+
+# Next.js build output
+/.next/
+/out/
+
+# production
+/build
+
+# env files: only .env.example is committed (public variable names, empty values)
+.env*.local
+.env
+!.env.example
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# misc
+.DS_Store
+*.log
+/coverage

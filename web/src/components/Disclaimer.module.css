@@ -1,0 +1,31 @@
+.footer {
+  margin-top: 48px;
+  padding-block: 24px 32px;
+  border-top: 1px solid var(--line);
+  background: var(--slate);
+  font-size: 0.9rem;
+}
+
+.disclaimer {
+  color: var(--bone);
+  font-weight: 500;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.links a {
+  display: inline-block;
+  padding-block: 6px;
+}
+
+.network {
+  margin: 0;
+  color: var(--bone-muted);
+}

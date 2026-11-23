@@ -1,0 +1,41 @@
+.cards {
+  display: grid;
+  gap: 12px;
+  margin: 0 0 32px;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  position: relative;
+  padding: 18px var(--gutter) 6px 56px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--slate);
+}
+
+.step {
+  position: absolute;
+  left: 16px;
+  top: 18px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--brass);
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.title {
+  font-size: 1.25rem;
+  margin-bottom: 6px;
+}
+
+@media (min-width: 720px) {
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

@@ -1,0 +1,81 @@
+.example {
+  padding: 20px var(--gutter);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--slate);
+  margin-bottom: 24px;
+}
+
+.heading {
+  font-size: 1.4rem;
+}
+
+.board {
+  display: grid;
+  gap: 12px;
+  padding: 16px 12px;
+  border-radius: 10px;
+  background: var(--ink);
+}
+
+.row {
+  display: grid;
+  gap: 6px;
+}
+
+.label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+.dice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.bidLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+}
+
+.bidChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px 4px 14px;
+  border-radius: 999px;
+  background: var(--bone);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.liar {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--ember);
+  letter-spacing: 0.04em;
+}
+
+.caption {
+  margin-top: 16px;
+  min-height: 7.5em;
+}
+
+.stepCount {
+  margin-bottom: 4px;
+  font-weight: 600;
+  color: var(--brass);
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+}

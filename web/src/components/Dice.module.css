@@ -1,0 +1,55 @@
+.die {
+  --size: 64px;
+  display: inline-grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  place-items: center;
+  width: var(--size);
+  height: var(--size);
+  padding: calc(var(--size) * 0.12);
+  border-radius: calc(var(--size) * 0.2);
+  flex: none;
+}
+
+.sm {
+  --size: 44px;
+}
+
+.bone {
+  background: var(--bone);
+  box-shadow:
+    inset 0 -3px 0 rgb(14 18 25 / 18%),
+    0 2px 6px rgb(0 0 0 / 35%);
+}
+
+.pip {
+  width: calc(var(--size) * 0.17);
+  height: calc(var(--size) * 0.17);
+  border-radius: 50%;
+  background: var(--ink);
+  box-shadow: inset 0 1px 1px rgb(0 0 0 / 50%);
+}
+
+.empty {
+  width: 0;
+  height: 0;
+}
+
+.lit {
+  outline: 3px solid var(--brass);
+  outline-offset: 2px;
+}
+
+.cipher {
+  background: linear-gradient(160deg, #222b3d, var(--slate));
+  border: 1px solid var(--line);
+  box-shadow: inset 0 0 12px rgb(201 162 75 / 10%);
+}
+
+.glyph {
+  font-family: var(--font-mono);
+  font-size: calc(var(--size) * 0.2);
+  line-height: 1;
+  color: var(--bone-muted);
+  user-select: none;
+}

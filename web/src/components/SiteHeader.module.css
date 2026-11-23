@@ -1,0 +1,51 @@
+.header {
+  border-bottom: 1px solid var(--line);
+  background: var(--ink);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 60px;
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--bone);
+  text-decoration: none;
+}
+
+.wordmark::after {
+  content: ".";
+  color: var(--brass);
+}
+
+.nav {
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.navLink {
+  display: inline-block;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: var(--bone-muted);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.navLink:hover {
+  color: var(--bone);
+}
+
+.navLink[aria-current="page"] {
+  color: var(--brass);
+}
