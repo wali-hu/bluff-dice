@@ -18,6 +18,8 @@ export default tseslint.config(
       "dist/**",
       "node_modules/**",
       "types/**",
+      // The Next.js app has its own ESLint config and lockfile (web/eslint.config.mjs).
+      "web/**",
       "*.env",
       "*.log",
       "coverage.json",

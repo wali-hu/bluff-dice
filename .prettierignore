@@ -1,17 +1,20 @@
+# Root build output is anchored with a leading "/" (same rule as .gitignore).
+
 # fhevm
-fhevmTemp
+/fhevmTemp
 
 # directories
-.coverage_artifacts
-.coverage_cache
-.coverage_contracts
-artifacts
-build
-cache
-coverage
-dist
+/.coverage_artifacts
+/.coverage_cache
+/.coverage_contracts
+/artifacts
+/build
+/cache
+/coverage
+/dist
 node_modules
-types
+/types
+.next
 
 # files
 *.env
@@ -19,7 +22,7 @@ types
 .DS_Store
 .pnp.*
 bun.lockb
-coverage.json
+/coverage.json
 package-lock.json
 pnpm-lock.yaml
 yarn.lock

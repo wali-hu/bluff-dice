@@ -1,25 +1,28 @@
+# Root build output is anchored with a leading "/" so that folders with the same name inside
+# web/ (for example web/src/types) are never ignored by accident. web/ has its own .gitignore.
+
 # fhevm
-fhevmTemp
+/fhevmTemp
 
 # directories
-.coverage_artifacts
-.coverage_cache
-.coverage_contracts
-artifacts
-build
-cache
-coverage
-dist
+/.coverage_artifacts
+/.coverage_cache
+/.coverage_contracts
+/artifacts
+/build
+/cache
+/coverage
+/dist
 node_modules
-types
-deployments
-tmp
+/types
+/deployments
+/tmp
 
 # files
 *.env
 *.log
 .DS_Store
 .pnp.*
-coverage.json
+/coverage.json
 pnpm-lock.yaml
 yarn.lock
