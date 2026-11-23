@@ -21,3 +21,6 @@ next-env.d.ts
 .DS_Store
 *.log
 /coverage
+
+# Vercel CLI project link (ids only, no secrets)
+.vercel

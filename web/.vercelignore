@@ -1,0 +1,23 @@
+# Files never uploaded by `vercel deploy` from web/. When this file exists Vercel does not read .gitignore,
+# so every exclusion is listed here. Vercel builds the app itself (npm install + next build).
+
+# secrets and local env files (including .env.example: not needed for the build)
+.env*
+
+# dependencies and build output
+node_modules
+.next
+out
+build
+*.tsbuildinfo
+next-env.d.ts
+
+# tests and coverage output
+coverage
+test-results
+playwright-report
+
+# local tooling
+.vercel
+.DS_Store
+*.log
