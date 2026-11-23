@@ -1,0 +1,38 @@
+.status {
+  margin: 8px 0 0;
+  font-size: 0.95rem;
+}
+
+.idle {
+  color: var(--bone-muted);
+}
+
+.running {
+  color: var(--bone);
+}
+
+.ok {
+  color: var(--verdigris);
+}
+
+/* Ember text on slate is below AA (4.2:1), so the error tone is a marker, the text stays bone. */
+.failed {
+  padding-left: 10px;
+  border-left: 3px solid var(--ember);
+  color: var(--bone);
+}
+
+.hint {
+  color: var(--bone-muted);
+}
+
+.detail {
+  display: block;
+  color: var(--bone-muted);
+}
+
+.retry {
+  min-height: 36px;
+  padding: 6px 14px;
+  margin-left: 6px;
+}

@@ -6,6 +6,7 @@ import { WagmiProvider } from "wagmi";
 
 import { TxQueueProvider } from "@/chain/TxQueueProvider";
 import { wagmiConfig } from "@/chain/wagmi";
+import { FheProvider } from "@/fhe/FheProvider";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   // One QueryClient per browser tab (created lazily, never shared between server requests).
@@ -13,7 +14,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
-        <TxQueueProvider>{children}</TxQueueProvider>
+        <TxQueueProvider>
+          <FheProvider>{children}</FheProvider>
+        </TxQueueProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );

@@ -1,0 +1,43 @@
+.card {
+  margin-top: 16px;
+  padding: 18px var(--gutter);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--slate);
+}
+
+.title {
+  font-size: 1.2rem;
+  margin-bottom: 6px;
+}
+
+.lead {
+  color: var(--bone-muted);
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+.ready {
+  margin: 8px 0 0;
+  color: var(--verdigris);
+  font-weight: 600;
+}
+
+.timing {
+  display: grid;
+  gap: 4px;
+  margin: 12px 0 0;
+  font-size: 0.9rem;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--bone-muted);
+}
+
+.row dd {
+  margin: 0;
+  color: var(--bone);
+}

@@ -1,14 +1,15 @@
 import { BLUFF_DICE_DEPLOY_BLOCK } from "@/contracts/addresses";
 
-/** Public keyless Sepolia RPC used when NEXT_PUBLIC_SEPOLIA_RPC_URL is empty. */
-export const DEFAULT_SEPOLIA_RPC_URL = "https://ethereum-sepolia-rpc.publicnode.com";
+import { resolveRpcUrl } from "./rpc";
+
+export { DEFAULT_SEPOLIA_RPC_URL } from "./rpc";
 
 function trimmed(value: string | undefined): string {
   return (value ?? "").trim();
 }
 
 /** Read RPC (all reads; writes always go through the wallet). Public by design: it ships to the browser. */
-export const SEPOLIA_RPC_URL = trimmed(process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL) || DEFAULT_SEPOLIA_RPC_URL;
+export const SEPOLIA_RPC_URL = resolveRpcUrl(process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL);
 
 /** Bot player address (Phase F). Empty string = bot mode hidden. */
 export const BOT_ADDRESS = trimmed(process.env.NEXT_PUBLIC_BOT_ADDRESS);

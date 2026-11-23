@@ -26,3 +26,6 @@ bun.lockb
 package-lock.json
 pnpm-lock.yaml
 yarn.lock
+
+# Vendored, sha256-pinned FHE client files (copied by web/scripts/sync-fhe-assets.mts)
+/web/public/fhe

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import { ChipsCard } from "@/components/ChipsCard";
+import { FheInitPanel } from "@/components/FheInitPanel";
 import { WalletGate } from "@/components/Gates";
 import { ReadinessChecklist } from "@/components/ReadinessChecklist";
 
@@ -27,6 +29,8 @@ export default function PlayPage() {
         </h2>
         <ReadinessChecklist />
       </section>
+      <FheInitPanel />
+      <ChipsCard />
     </div>
   );
 }

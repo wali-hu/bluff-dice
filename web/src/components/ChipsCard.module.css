@@ -1,0 +1,39 @@
+.card {
+  margin-top: 16px;
+  padding: 18px var(--gutter);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--slate);
+}
+
+.title {
+  font-size: 1.2rem;
+  margin-bottom: 6px;
+}
+
+.muted {
+  margin: 0;
+  color: var(--bone-muted);
+  font-size: 0.95rem;
+}
+
+.actions {
+  margin-top: 12px;
+}
+
+.error {
+  margin: 8px 0 0;
+  padding-left: 10px;
+  border-left: 3px solid var(--ember);
+}
+
+.result {
+  margin-top: 12px;
+}
+
+.amount {
+  margin: 0 0 4px;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 600;
+}
