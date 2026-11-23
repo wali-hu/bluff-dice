@@ -1,0 +1,20 @@
+# Vercel deploys run from the repo root but upload ONLY the web app (web/). Everything at the root is excluded
+# first, then web/ is re-included, then local and build files inside web/ are excluded again.
+# Check before every deploy: `npm run deploy:check` (prints the upload list, fails on anything outside web/).
+# Deploys always pass --environment preview (`npm run deploy:preview`); production only on the owner's word.
+/*
+!/web
+
+/web/.env*
+/web/.next
+/web/node_modules
+/web/out
+/web/build
+/web/coverage
+/web/test-results
+/web/playwright-report
+/web/.vercel
+/web/*.tsbuildinfo
+/web/next-env.d.ts
+**/.DS_Store
+**/*.log

@@ -79,7 +79,9 @@
     "chain": "hardhat node --network hardhat --no-deploy",
     "deploy:localhost": "hardhat deploy --network localhost",
     "deploy:sepolia": "hardhat deploy --network sepolia",
-    "verify:sepolia": "hardhat verify --network sepolia"
+    "verify:sepolia": "hardhat verify --network sepolia",
+    "deploy:check": "node scripts/check-vercel-upload.mjs",
+    "deploy:preview": "npm run deploy:check && npx --yes vercel@66.6.0 deploy --scope abdullah-5c43 --environment preview"
   },
   "overrides": {
     "ws@>=7.0.0 <7.5.10": ">=7.5.10",
