@@ -45,10 +45,11 @@ export function entry(
 
 let logIndex = 0;
 function rawLog(address: Address, topics: Hex[], data: Hex, blockNumber: bigint) {
+  const [first, ...rest] = topics;
   logIndex++;
   return {
     address,
-    topics,
+    topics: [first as Hex, ...rest] as [Hex, ...Hex[]],
     data,
     blockNumber,
     blockHash: `0x${"aa".repeat(32)}` as Hex,
@@ -120,4 +121,22 @@ export function fakeClient(opts: {
     },
   } as unknown as PublicClient;
   return { client, calls };
+}
+
+type DiceEvent = Extract<(typeof bluffDiceAbi)[number], { type: "event" }>;
+
+/** Any BluffDice event as a raw log (indexed args -> topics, the rest -> data), for timeline tests. */
+export function gameEventLog(
+  eventName: DiceEvent["name"],
+  args: Record<string, unknown>,
+  blockNumber: bigint,
+  txHash?: Hex,
+) {
+  const item = bluffDiceAbi.find((x) => x.type === "event" && x.name === eventName) as DiceEvent;
+  const indexed = Object.fromEntries(item.inputs.filter((i) => i.indexed).map((i) => [i.name, args[i.name]]));
+  const plain = item.inputs.filter((i) => !i.indexed);
+  const topics = encodeEventTopics({ abi: [item], eventName, args: indexed } as never) as Hex[];
+  const data = encodeAbiParameters(plain, plain.map((i) => args[i.name]) as never);
+  const log = rawLog(BLUFF_DICE_ADDRESS, topics, data, blockNumber);
+  return txHash ? { ...log, transactionHash: txHash } : log;
 }

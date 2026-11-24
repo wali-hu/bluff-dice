@@ -14,6 +14,7 @@ import {
   resumeStep,
   type PlayEvent,
   type SeatTarget,
+  elsewhereNotice,
   seatSituation,
 } from "./playNow";
 import { DEFAULT_PLAYERS, DEFAULT_STAKE } from "./stakes";
@@ -185,5 +186,28 @@ describe("seatSituation (one address may sit at several tables)", () => {
     const stopped = playReducer({ ...initialPlayRun, running: true }, { type: "seatedElsewhere", tableId: 10n });
     expect(stopped).toMatchObject({ running: false, seatedElsewhere: 10n });
     expect(playReducer(stopped, { type: "start" }).seatedElsewhere).toBeNull();
+  });
+});
+
+describe("seated-elsewhere notice on page load (before any run)", () => {
+  it("shows the other table from the lobby read at once", () => {
+    expect(elsewhereNotice({ situation: seatSituation([10n], 11n), fromRun: null, anotherSeatChosen: false })).toBe(
+      10n,
+    );
+    expect(
+      elsewhereNotice({ situation: seatSituation([10n], undefined), fromRun: null, anotherSeatChosen: false }),
+    ).toBe(10n);
+  });
+
+  it("no notice when seated at the requested table, free, or after 'Join table #M too'", () => {
+    expect(
+      elsewhereNotice({ situation: seatSituation([11n], 11n), fromRun: null, anotherSeatChosen: false }),
+    ).toBeNull();
+    expect(elsewhereNotice({ situation: seatSituation([], 11n), fromRun: null, anotherSeatChosen: false })).toBeNull();
+    expect(elsewhereNotice({ situation: seatSituation([10n], 11n), fromRun: 10n, anotherSeatChosen: true })).toBeNull();
+  });
+
+  it("a run that stopped for the same reason keeps the notice", () => {
+    expect(elsewhereNotice({ situation: { kind: "free" }, fromRun: 12n, anotherSeatChosen: false })).toBe(12n);
   });
 });

@@ -76,11 +76,17 @@ export interface ScanOptions {
   /** Must be a block this tab already saw (a receipt or a head we read): never "latest" (RPC lag). */
   readonly toBlock: bigint;
   readonly newestFirst?: boolean;
+  /** Blocks per request (default 50,000). Smaller and recent for tables: some public RPC backends refuse wide
+   * old ranges ("pruned history unavailable", code 4444). */
+  readonly span?: bigint;
 }
 
 /** Decoded BluffDice events, chunk by chunk. Inside a chunk, logs keep chain order. */
-export async function* scanGameLogs(client: PublicClient, { fromBlock, toBlock, newestFirst = false }: ScanOptions) {
-  for (const range of chunkRanges(fromBlock, toBlock, { newestFirst })) {
+export async function* scanGameLogs(
+  client: PublicClient,
+  { fromBlock, toBlock, newestFirst = false, span }: ScanOptions,
+) {
+  for (const range of chunkRanges(fromBlock, toBlock, { newestFirst, ...(span ? { span } : {}) })) {
     const raw = await fetchRange(client, BLUFF_DICE_ADDRESS, range);
     yield { range, logs: decodeGameLogs(raw) };
   }

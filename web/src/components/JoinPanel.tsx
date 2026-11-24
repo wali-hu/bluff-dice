@@ -16,7 +16,7 @@ import { createWrite, joinWrite } from "@/chain/writes";
 import { BOT_ADDRESS } from "@/config/bot";
 import { botView, BOT_TEXT } from "@/lib/botState";
 import { formatChips } from "@/lib/chips";
-import { defaultDescribeContext, type TxError } from "@/lib/errors";
+import { defaultDescribeContext, needsReauthorize, type TxError } from "@/lib/errors";
 import { groupTables, isOpen } from "@/lib/lobby";
 import { balanceTooLow, nextFaucetAt } from "@/lib/onboarding";
 import { seatSituation } from "@/lib/playNow";
@@ -25,6 +25,7 @@ import { onboardingTimer } from "@/lib/stepTimer";
 import { useNow } from "@/lib/useNow";
 import { useSearchParam } from "@/lib/useSearchParam";
 
+import { AuthorizeAgain } from "./AuthorizeAgain";
 import styles from "./Onboarding.module.css";
 import { UnlockCard } from "./UnlockCard";
 import { EncryptedAmountNote } from "@/components/EncryptedAmountNote";
@@ -50,6 +51,8 @@ export function JoinPanel({ reads }: { reads: PlayerChainReads }) {
   const [takenTableId, setTakenTableId] = useState<bigint | null>(null);
   const [joiningBot, setJoiningBot] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  // Set when a join/create failed because the operator grant expired: "Authorize again", then retry it.
+  const [retryAfterAuth, setRetryAfterAuth] = useState<(() => Promise<unknown>) | null>(null);
 
   const searching = seatTakenAt !== null && now - seatTakenAt < 30_000;
   const botTable = useQuery({
@@ -101,6 +104,7 @@ export function JoinPanel({ reads }: { reads: PlayerChainReads }) {
   /** Resolves with the contract error name on failure ("" for other failures), null on success. */
   async function join(tableId: bigint, viaBot: boolean): Promise<string | null> {
     setMessage(null);
+    setRetryAfterAuth(null);
     setJoiningBot(viaBot);
     const outcome = await tx.run(joinWrite(tableId));
     setJoiningBot(false);
@@ -108,6 +112,7 @@ export function JoinPanel({ reads }: { reads: PlayerChainReads }) {
       seated(tableId);
       return null;
     }
+    if (needsReauthorize(outcome.error)) setRetryAfterAuth(() => () => join(tableId, viaBot));
     const name = contractError(outcome.error);
     if (viaBot && name === "WrongPhase") {
       setSeatTakenAt(now);
@@ -132,10 +137,17 @@ export function JoinPanel({ reads }: { reads: PlayerChainReads }) {
       tx.reset();
     }
     setMessage(null);
+    await createDefault();
+  }
+
+  async function createDefault(): Promise<void> {
+    setRetryAfterAuth(null);
     const outcome = await tx.run(createWrite(DEFAULT_STAKE, DEFAULT_PLAYERS));
     if (outcome.ok) {
       const id = tableIdFromReceipt(outcome.value);
       if (id !== undefined) seated(id);
+    } else if (needsReauthorize(outcome.error)) {
+      setRetryAfterAuth(() => createDefault);
     }
   }
 
@@ -233,6 +245,7 @@ export function JoinPanel({ reads }: { reads: PlayerChainReads }) {
           {message}
         </p>
       ) : null}
+      {retryAfterAuth ? <AuthorizeAgain retry={retryAfterAuth} /> : null}
 
       {joiningBot && tx.state.status === "pending" ? (
         <UnlockCard context="While your seat is being confirmed:" />

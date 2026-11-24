@@ -11,6 +11,8 @@ import {
   decodeRevertData,
   describeContractError,
   ERROR_MESSAGES,
+  needsReauthorize,
+  REAUTHORIZE_LABEL,
   toTxError,
   type ContractErrorName,
   type DescribeContext,
@@ -118,5 +120,25 @@ describe("toTxError", () => {
 
   it("anything else", () => {
     expect(toTxError(new Error("socket hang up"))).toMatchObject({ kind: "unknown" });
+  });
+});
+
+describe("Authorize again mapping", () => {
+  it("only an expired operator (ERC7984UnauthorizedSpender) offers Authorize again", () => {
+    const expired = decodeRevertData(
+      encodeErrorResult({
+        abi: combinedErrorsAbi,
+        errorName: "ERC7984UnauthorizedSpender",
+        args: [BLUFF_DICE_ADDRESS, BLUFF_DICE_ADDRESS],
+      }),
+    );
+    expect(needsReauthorize(expired)).toBe(true);
+    const wrongPhase = decodeRevertData(
+      encodeErrorResult({ abi: combinedErrorsAbi, errorName: "WrongPhase", args: [1n, 1, 2] }),
+    );
+    expect(needsReauthorize(wrongPhase)).toBe(false);
+    expect(needsReauthorize({ kind: "rejected", message: "x" })).toBe(false);
+    expect(needsReauthorize(null)).toBe(false);
+    expect(REAUTHORIZE_LABEL).toBe("Authorize again (one transaction)");
   });
 });

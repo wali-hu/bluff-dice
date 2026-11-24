@@ -26,7 +26,7 @@ const STEP_CLASS = {
 export function PlayNow() {
   const tableParam = useSearchParam("table");
   const requested = tableParam && /^\d+$/.test(tableParam) ? BigInt(tableParam) : undefined;
-  const { run, done, seatedId, start, oneByOne, joinAnyway } = usePlayNow(requested);
+  const { run, done, seatedId, elsewhereId, start, oneByOne, joinAnyway } = usePlayNow(requested);
   const tx = useTxQueue();
   const progress = progressOf(done, run);
   const allDone = PLAY_STEPS.every((s) => progress[s] === "done");
@@ -74,18 +74,18 @@ export function PlayNow() {
         ))}
       </ol>
 
-      {run.seatedElsewhere !== null ? (
+      {elsewhereId !== null ? (
         <div className={styles.notice} role="status">
           <p>
-            You already have a seat at table #{run.seatedElsewhere.toString()}.{" "}
+            You already have a seat at table #{elsewhereId.toString()}.{" "}
             {requested !== undefined
-              ? `You have not joined table #${requested.toString()}.`
-              : "Play now did not take a new seat."}{" "}
+              ? `You have not joined table #${requested.toString()} yet.`
+              : "Play now will not take a second seat unless you ask for it."}{" "}
             One account can sit at more than one table; each seat locks its own stake.
           </p>
           <div className={styles.actions}>
-            <Link className="button button-primary" href={`/table/${run.seatedElsewhere}`}>
-              Open table #{run.seatedElsewhere.toString()}
+            <Link className="button button-primary" href={`/table/${elsewhereId}`}>
+              Open table #{elsewhereId.toString()}
             </Link>
             <button type="button" className="button button-ghost" disabled={tx.busy} onClick={joinAnyway}>
               {requested !== undefined ? `Join table #${requested.toString()} too` : "Take another seat anyway"}
@@ -94,7 +94,7 @@ export function PlayNow() {
         </div>
       ) : null}
 
-      {run.seatedElsewhere === null ? (
+      {elsewhereId === null ? (
         <div className={styles.actions}>
           {allDone && seatedId !== undefined ? (
             <Link className="button button-primary" href={`/table/${seatedId}`}>

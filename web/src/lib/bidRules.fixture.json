@@ -1,0 +1,23 @@
+{
+  "source": "BluffDice._validateBid (contracts/BluffDice.sol): face 1..6, quantity 1..playerCount*5, then quantity > prev or (quantity == prev and face > prevFace)",
+  "cases": [
+    { "players": 2, "prevQuantity": 0, "prevFace": 0, "quantity": 1, "face": 1, "expect": "ok" },
+    { "players": 2, "prevQuantity": 0, "prevFace": 0, "quantity": 10, "face": 6, "expect": "ok" },
+    { "players": 2, "prevQuantity": 0, "prevFace": 0, "quantity": 11, "face": 1, "expect": "InvalidQuantity" },
+    { "players": 2, "prevQuantity": 0, "prevFace": 0, "quantity": 0, "face": 3, "expect": "InvalidQuantity" },
+    { "players": 2, "prevQuantity": 0, "prevFace": 0, "quantity": 1, "face": 0, "expect": "InvalidFace" },
+    { "players": 2, "prevQuantity": 0, "prevFace": 0, "quantity": 1, "face": 7, "expect": "InvalidFace" },
+    { "players": 2, "prevQuantity": 0, "prevFace": 0, "quantity": 0, "face": 0, "expect": "InvalidFace" },
+    { "players": 2, "prevQuantity": 3, "prevFace": 4, "quantity": 3, "face": 5, "expect": "ok" },
+    { "players": 2, "prevQuantity": 3, "prevFace": 4, "quantity": 3, "face": 4, "expect": "BidNotHigher" },
+    { "players": 2, "prevQuantity": 3, "prevFace": 4, "quantity": 3, "face": 1, "expect": "BidNotHigher" },
+    { "players": 2, "prevQuantity": 3, "prevFace": 4, "quantity": 4, "face": 1, "expect": "ok" },
+    { "players": 2, "prevQuantity": 3, "prevFace": 4, "quantity": 2, "face": 6, "expect": "BidNotHigher" },
+    { "players": 2, "prevQuantity": 10, "prevFace": 6, "quantity": 10, "face": 6, "expect": "BidNotHigher" },
+    { "players": 2, "prevQuantity": 10, "prevFace": 5, "quantity": 10, "face": 6, "expect": "ok" },
+    { "players": 4, "prevQuantity": 7, "prevFace": 6, "quantity": 20, "face": 1, "expect": "ok" },
+    { "players": 4, "prevQuantity": 7, "prevFace": 6, "quantity": 21, "face": 6, "expect": "InvalidQuantity" },
+    { "players": 3, "prevQuantity": 5, "prevFace": 2, "quantity": 5, "face": 3, "expect": "ok" },
+    { "players": 3, "prevQuantity": 5, "prevFace": 2, "quantity": 16, "face": 2, "expect": "InvalidQuantity" }
+  ]
+}

@@ -26,7 +26,11 @@ export const combinedErrorsAbi: readonly ErrorItem[] = (() => {
 })();
 
 /** How the UI reacts: show a message, or refresh state silently (the table moved on, nothing to explain). */
-export type ErrorPresentation = { readonly silent: boolean; readonly message: string };
+/**
+ * silent: refresh without a message (the table moved on). soft: an expected "not yet" answer, shown as an info
+ * line, never as a failure (E5-R7).
+ */
+export type ErrorPresentation = { readonly silent: boolean; readonly message: string; readonly soft?: boolean };
 
 type Args = readonly unknown[];
 type Describe = (args: Args, ctx: DescribeContext) => ErrorPresentation;
@@ -45,6 +49,7 @@ export const defaultDescribeContext: DescribeContext = {
 
 const show = (message: string): ErrorPresentation => ({ silent: false, message });
 const refresh = (message: string): ErrorPresentation => ({ silent: true, message });
+const info = (message: string): ErrorPresentation => ({ silent: false, soft: true, message });
 
 const PROOF_RETRY = "The decryption proof was rejected onchain. Fetch a fresh proof and push again.";
 const INTERNAL = "The contract refused an internal state it should never reach. Please report this table.";
@@ -58,9 +63,13 @@ export const ERROR_MESSAGES: Record<ContractErrorName, Describe> = {
   // BluffDice
   AlreadySeated: () => show("You already have a seat at this table."),
   BidNotHigher: ([prevQ, prevF]) =>
-    show(`Your bid must beat ${String(prevQ)} × ${String(prevF)}: more dice, or the same number with a higher face.`),
+    show(
+      `Bid must be higher than ${String(prevQ)} × ${String(prevF)}: more dice, or the same number with a higher face.`,
+    ),
   DeadlineNotPassed: ([, deadline], { formatTime }) =>
-    show(`Not yet. This becomes possible after ${formatTime(deadline as bigint)}.`),
+    info(
+      `Not yet: the chain has not reached the deadline (${formatTime(deadline as bigint)}). Try again in a few seconds.`,
+    ),
   DieNotInitialized: () => show(INTERNAL),
   DroppedFromTable: () =>
     show(
@@ -80,15 +89,15 @@ export const ERROR_MESSAGES: Record<ContractErrorName, Describe> = {
     show(`The stake must split evenly between ${Number(maxPlayers) - 1} winners. Pick one of the offered stakes.`),
   InvalidToken: () => show(DEPLOY_ONLY),
   LiarNotCalled: () => refresh("Nobody has called Liar at this table yet."),
-  NoBidToChallenge: () => show("There is no bid to call Liar on yet. Open with a bid."),
+  NoBidToChallenge: () => show("No bid to challenge yet. Open with a bid."),
   NotCancellable: () => refresh("This table cannot be cancelled any more: it already moved on."),
   NotPlayer: () => show("You are not seated at this table."),
-  NotYourTurn: () => show("It is not your turn."),
+  NotYourTurn: () => show("Not your turn."),
   PaidCheckNotRequested: () => refresh("The stake check has not started yet. Refreshing the table."),
   PaidFlagNotInitialized: () => show(INTERNAL),
   ReentrancyGuardReentrantCall: () => show(INTERNAL),
   TableNotFound: () => show("This table does not exist."),
-  TurnExpired: () => show("Too late: the turn time ran out. Anyone can now claim the timeout."),
+  TurnExpired: () => show("Too late: anyone can now claim the timeout. The turn time ran out."),
   WrongPhase: () => refresh("The table already moved on. Refreshing."),
   ZamaProtocolUnsupported: () => show(DEPLOY_ONLY),
   // BluffChips (OZ ERC-7984 0.5.3, Ownable, FHE library)
@@ -118,7 +127,7 @@ export const ERROR_MESSAGES: Record<ContractErrorName, Describe> = {
 
 /** Everything the transaction queue can end with, in words. */
 export type TxError =
-  | { kind: "contract"; name: ContractErrorName; args: Args; silent: boolean; message: string }
+  | { kind: "contract"; name: ContractErrorName; args: Args; silent: boolean; soft?: boolean; message: string }
   | { kind: "rejected"; message: string }
   | { kind: "inFlightLimit"; message: string }
   | { kind: "insufficientFunds"; message: string }
@@ -133,8 +142,10 @@ export function describeContractError(
   args: Args,
   ctx: DescribeContext = defaultDescribeContext,
 ): TxError {
-  const { silent, message } = ERROR_MESSAGES[name](args, ctx);
-  return { kind: "contract", name, args, silent, message };
+  const { silent, message, soft } = ERROR_MESSAGES[name](args, ctx);
+  return soft
+    ? { kind: "contract", name, args, silent, soft, message }
+    : { kind: "contract", name, args, silent, message };
 }
 
 /** Decodes raw revert data against the combined ABI; null when the selector is unknown. */
@@ -193,4 +204,22 @@ export function toTxError(error: unknown, ctx: DescribeContext = defaultDescribe
     message: "The transaction could not be sent. Check your connection and try again.",
     detail: text.slice(0, 500),
   };
+}
+
+/**
+ * A join/create failed because the table's permission to take the stake expired (OZ ERC-7984 operator `until`
+ * passed): offer "Authorize again (one transaction)", then retry the same write. Pure.
+ */
+export function needsReauthorize(error: TxError | null | undefined): boolean {
+  return error?.kind === "contract" && error.name === "ERC7984UnauthorizedSpender";
+}
+
+export const REAUTHORIZE_LABEL = "Authorize again (one transaction)";
+
+/**
+ * E5-R12: after "Authorize again", retry the original join/create only if the authorize transaction succeeded
+ * and no retry happened yet (never a loop). Pure.
+ */
+export function reauthorizeNext(authorizeOk: boolean, retriesSoFar: number): "retry" | "stop" {
+  return authorizeOk && retriesSoFar === 0 ? "retry" : "stop";
 }

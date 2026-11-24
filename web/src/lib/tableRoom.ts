@@ -10,6 +10,8 @@ export const PHASE_NAMES: Record<PhaseValue, string> = {
   [Phase.Cancelled]: "Cancelled",
 };
 
+export const CANCELLED_TEXT = "Cancelled: every stake was refunded.";
+
 export type RoomView =
   | { kind: "notFound" }
   | { kind: "waiting" } // full waiting room (seats, invite link, Unlock, Leave/Join)
@@ -31,8 +33,12 @@ export function roomView(phase: number): RoomView {
     case Phase.AwaitingReveal:
       return { kind: "inProgress", text: "Game in progress: the table view arrives in the next update." };
     case Phase.Settled:
+      return {
+        kind: "over",
+        text: "This round is over. The full result with every die and the proof check arrives in the next update.",
+      };
     case Phase.Cancelled:
-      return { kind: "over", text: "This table is over: the results view arrives in the next update." };
+      return { kind: "over", text: CANCELLED_TEXT };
     default:
       return { kind: "notFound" };
   }

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { Phase } from "@/chain/reads";
 
-import { cancelState, PHASE_NAMES, roomView } from "./tableRoom";
+import { CANCELLED_TEXT, cancelState, PHASE_NAMES, roomView } from "./tableRoom";
 
 describe("roomView", () => {
   it("maps every contract phase", () => {
@@ -32,5 +32,14 @@ describe("cancelState (BluffDice.cancel)", () => {
     expect(cancelState(Phase.AwaitingPaidProof, 100n, 100n)).toEqual({ kind: "wait", deadline: 100n });
     expect(cancelState(Phase.AwaitingPaidProof, 100n, 101n)).toEqual({ kind: "available" });
     expect(cancelState(Phase.AwaitingReveal, 100n, 101n)).toEqual({ kind: "available" });
+  });
+});
+
+describe("over copy", () => {
+  it("cancelled tables say every stake was refunded", () => {
+    expect(roomView(Phase.Cancelled)).toEqual({ kind: "over", text: "Cancelled: every stake was refunded." });
+    expect(CANCELLED_TEXT).toBe("Cancelled: every stake was refunded.");
+    const settled = roomView(Phase.Settled);
+    expect(settled.kind === "over" && settled.text).not.toContain("refunded");
   });
 });

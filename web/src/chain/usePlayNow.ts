@@ -2,7 +2,7 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useCallback, useReducer, useRef } from "react";
+import { useCallback, useReducer, useRef, useState } from "react";
 import type { Address, PublicClient } from "viem";
 import { useConnection, usePublicClient } from "wagmi";
 import {
@@ -35,6 +35,7 @@ import {
   playReducer,
   type PlayStep,
   type SeatPath,
+  elsewhereNotice,
   seatSituation,
   type SeatTarget,
   UPGRADE_NOTICE,
@@ -115,6 +116,7 @@ export function usePlayNow(requestedTableId?: bigint) {
   const preferSequential = useRef(false);
   // "Join this table too": the player saw their seat at another table and chose to take a second one.
   const allowAnotherSeat = useRef(false);
+  const [anotherSeatChosen, setAnotherSeatChosen] = useState(false);
   const client = usePublicClient();
   const tx = useTxQueue();
   const fhe = useFheClient();
@@ -423,8 +425,12 @@ export function usePlayNow(requestedTableId?: bigint) {
   /** After "you already sit at table #N": the player explicitly takes a seat here as well. */
   const joinAnyway = useCallback(() => {
     allowAnotherSeat.current = true;
+    setAnotherSeatChosen(true);
     void start();
   }, [start]);
 
-  return { run, done, seatedId, start, oneByOne, joinAnyway };
+  // Shown on page load (lobby read), not only after Play now was pressed.
+  const elsewhereId = elsewhereNotice({ situation, fromRun: run.seatedElsewhere, anotherSeatChosen });
+
+  return { run, done, seatedId, elsewhereId, start, oneByOne, joinAnyway };
 }

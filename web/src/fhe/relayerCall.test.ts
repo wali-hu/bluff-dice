@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { FheError } from "./errors";
-import { LAG_RETRY, NO_RETRY, relayerCall, WATCHDOG_MS } from "./relayerCall";
+import { LAG_RETRY, NO_RETRY, OWN_DICE_RETRY, relayerCall, WATCHDOG_MS } from "./relayerCall";
 import { getStatus, resetStatusesForTests } from "./status";
 
 beforeEach(() => {
@@ -112,5 +112,54 @@ describe("relayerCall", () => {
         { channel: "userDecrypt", label: "x" },
       ),
     ).rejects.toMatchObject({ kind: "locked", message: "Sign first" });
+  });
+});
+
+describe("own dice right after the deal (OWN_DICE_RETRY)", () => {
+  const refusal = () => new Error("User address 0x1 is not authorized to user decrypt handle 0x2!");
+
+  it("ok at once: no retry", async () => {
+    let attempts = 0;
+    const call = relayerCall(
+      async () => {
+        attempts++;
+        return [3, 1, 6, 6, 2];
+      },
+      { channel: "userDecrypt", label: "Decrypting your dice", retry: OWN_DICE_RETRY },
+    );
+    await expect(call).resolves.toEqual([3, 1, 6, 6, 2]);
+    expect(attempts).toBe(1);
+  });
+
+  it("a lagging ACL refusal is retried until it passes", async () => {
+    let attempts = 0;
+    const call = relayerCall(
+      async () => {
+        attempts++;
+        if (attempts < 4) throw refusal();
+        return "dice";
+      },
+      { channel: "userDecrypt", label: "Decrypting your dice", retry: OWN_DICE_RETRY },
+    );
+    await vi.advanceTimersByTimeAsync(2_000 + 4_000 + 8_000);
+    await expect(call).resolves.toBe("dice");
+    expect(attempts).toBe(4);
+  });
+
+  it("gives up within 60 s and reports the refusal", async () => {
+    let attempts = 0;
+    const call = relayerCall(
+      async () => {
+        attempts++;
+        throw refusal();
+      },
+      { channel: "userDecrypt", label: "Decrypting your dice", retry: OWN_DICE_RETRY },
+    );
+    const expectation = expect(call).rejects.toMatchObject({ kind: "aclRefused" });
+    await vi.advanceTimersByTimeAsync(70_000);
+    await expectation;
+    // Waits 2 + 4 + 8 x 6 = 54 s fit in 60 s (9 attempts); one more 8 s wait would not.
+    expect(attempts).toBe(9);
+    expect(getStatus("userDecrypt").phase).toBe("failed");
   });
 });

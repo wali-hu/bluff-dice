@@ -235,6 +235,20 @@ export function seatSituation(activeSeats: readonly bigint[], requested: bigint 
   return other === undefined ? { kind: "free" } : { kind: "elsewhere", tableId: other };
 }
 
+/**
+ * The "you already sit at table #N" notice, decided on page load from the lobby read (before any run) and kept
+ * when a run stops for the same reason. Hidden once the player chose "Join table #M too". Pure.
+ */
+export function elsewhereNotice(input: {
+  readonly situation: SeatSituation;
+  readonly fromRun: bigint | null;
+  readonly anotherSeatChosen: boolean;
+}): bigint | null {
+  if (input.anotherSeatChosen) return null;
+  if (input.fromRun !== null) return input.fromRun;
+  return input.situation.kind === "elsewhere" ? input.situation.tableId : null;
+}
+
 /** The progress bar: chain-done or run-completed = done; the failed step; the active ones; the rest todo. */
 export function progressOf(done: DoneSet, run: PlayRun): Record<PlayStep, StepStatus> {
   const out = {} as Record<PlayStep, StepStatus>;

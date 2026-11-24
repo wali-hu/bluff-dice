@@ -9,16 +9,15 @@ import { useConnection, usePublicClient } from "wagmi";
 import { getTable, NO_SEAT } from "@/chain/reads";
 import { useTxQueue } from "@/chain/TxQueueProvider";
 import { useMounted } from "@/chain/useWalletGate";
-import { cancelWrite, leaveWrite } from "@/chain/writes";
+import { leaveWrite } from "@/chain/writes";
 import { isBotAddress } from "@/config/bot";
 import { formatChips } from "@/lib/chips";
-import { defaultDescribeContext } from "@/lib/errors";
 import { isOpen, seatOfIn } from "@/lib/lobby";
 import { potOf } from "@/lib/stakes";
-import { cancelState, PHASE_NAMES, roomView } from "@/lib/tableRoom";
-import { useNow } from "@/lib/useNow";
+import { PHASE_NAMES, roomView } from "@/lib/tableRoom";
 
 import { BotBadge } from "./BotBadge";
+import { GameTable } from "./GameTable";
 import styles from "./TableRoom.module.css";
 import { TxStatus } from "./TxStatus";
 import { EncryptedAmountNote } from "./EncryptedAmountNote";
@@ -30,7 +29,7 @@ function short(address: string): string {
   return `${address.slice(0, 6)}…${address.slice(-4)}`;
 }
 
-/** E4 table page: the full waiting room while Joining; a placeholder for later phases (table view is E5). */
+/** /table/<id>: the waiting room while Joining, the full table view (GameTable) in every later phase. */
 export function TableRoom({ id }: { id: string }) {
   const tableId = BigInt(id);
   const client = usePublicClient();
@@ -58,6 +57,8 @@ export function TableRoom({ id }: { id: string }) {
 
   const t = table.data;
   const view = roomView(t.phase);
+  // Every phase after Joining: the E5 table view.
+  if (view.kind !== "waiting" && view.kind !== "notFound") return <GameTable tableId={tableId} t={t} />;
   const mySeat = seatOfIn(t, address);
   const seated = mySeat !== NO_SEAT;
   const inviteUrl = mounted ? `${window.location.origin}/table/${tableId}` : `/table/${tableId}`;
@@ -138,52 +139,9 @@ export function TableRoom({ id }: { id: string }) {
             </Link>
           ) : null}
         </>
-      ) : view.kind === "notFound" ? (
-        <p className={styles.muted}>This table does not exist.</p>
       ) : (
-        <>
-          <p className={styles.notice} role="status">
-            {view.text}
-          </p>
-          <CancelPanel tableId={tableId} phase={t.phase} deadline={t.deadline} />
-          {seated && view.kind !== "over" ? <UnlockCard context="Your dice will need it:" /> : null}
-        </>
+        <p className={styles.muted}>This table does not exist.</p>
       )}
-    </div>
-  );
-}
-
-/**
- * Stuck tables give the stakes back: after the proof deadline anyone may call `cancel`, and every seat gets its
- * own stake back. Shown to seated players and spectators alike.
- */
-function CancelPanel({ tableId, phase, deadline }: { tableId: bigint; phase: number; deadline: bigint }) {
-  const tx = useTxQueue();
-  const now = BigInt(Math.floor(useNow() / 1000));
-  const state = cancelState(phase, deadline, now);
-  if (state.kind === "none") return null;
-  if (state.kind === "wait") {
-    return (
-      <p className={styles.muted}>
-        If this step is not sent onchain by {defaultDescribeContext.formatTime(state.deadline)}, anyone can cancel the
-        table and every player gets their own stake back.
-      </p>
-    );
-  }
-  return (
-    <div>
-      <p className={styles.muted}>
-        The deadline has passed. Anyone can now cancel this table: every player gets their own stake back.
-      </p>
-      <button
-        type="button"
-        className="button button-ghost"
-        disabled={tx.busy}
-        onClick={() => void tx.run(cancelWrite(tableId))}
-      >
-        Cancel table and refund every stake
-      </button>
-      <EncryptedAmountNote />
     </div>
   );
 }

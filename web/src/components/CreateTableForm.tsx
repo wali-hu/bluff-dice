@@ -11,11 +11,13 @@ import { usePlayerReads } from "@/chain/usePlayerReads";
 import { createWrite } from "@/chain/writes";
 import { MAX_PLAYERS, MIN_PLAYERS } from "@/config/game";
 import { formatChips } from "@/lib/chips";
+import { needsReauthorize } from "@/lib/errors";
 import { hasChips, operatorReady } from "@/lib/onboarding";
 import { DEFAULT_STAKE, payoutSentence, validStakes } from "@/lib/stakes";
 import { onboardingTimer } from "@/lib/stepTimer";
 import { useNow } from "@/lib/useNow";
 
+import { AuthorizeAgain } from "./AuthorizeAgain";
 import styles from "./Lobby.module.css";
 import { EncryptedAmountNote } from "@/components/EncryptedAmountNote";
 
@@ -35,9 +37,16 @@ export function CreateTableForm() {
   const nowSeconds = BigInt(Math.floor(now / 1000));
   const ready = reads.data ? hasChips(reads.data) && operatorReady({ ...reads.data, nowSeconds }) : false;
 
-  async function create() {
+  const [retryAfterAuth, setRetryAfterAuth] = useState<(() => Promise<unknown>) | null>(null);
+
+  async function create(): Promise<void> {
+    setRetryAfterAuth(null);
     const outcome = await tx.run(createWrite(chosen, players));
-    if (!outcome.ok) return;
+    if (!outcome.ok) {
+      // The table's permission to take the stake expired: "Authorize again", then the same create.
+      if (needsReauthorize(outcome.error)) setRetryAfterAuth(() => create);
+      return;
+    }
     const id = tableIdFromReceipt(outcome.value);
     onboardingTimer.seated();
     void queryClient.invalidateQueries();
@@ -86,6 +95,7 @@ export function CreateTableForm() {
           Claim chips and authorize the table first: <Link href="/play">Play setup</Link>.
         </p>
       )}
+      {retryAfterAuth ? <AuthorizeAgain retry={retryAfterAuth} /> : null}
     </form>
   );
 }

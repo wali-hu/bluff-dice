@@ -1,0 +1,270 @@
+.table {
+  display: grid;
+  gap: 16px;
+  padding-top: 24px;
+  padding-bottom: 24px;
+}
+
+.header {
+  display: grid;
+  gap: 6px;
+}
+
+.title {
+  font-size: clamp(1.8rem, 6vw, 2.6rem);
+  margin: 0;
+}
+
+.meta,
+.muted {
+  margin: 0;
+  color: var(--bone-muted);
+}
+
+.headerRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+}
+
+.phaseChip {
+  padding: 4px 12px;
+  border: 1px solid var(--brass);
+  border-radius: 999px;
+  color: var(--brass);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.txLink {
+  font-size: 0.9rem;
+}
+
+.ring {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.ringTrack {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 4;
+}
+
+.ringFill {
+  fill: none;
+  stroke: var(--brass);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.ringExpired {
+  fill: none;
+  stroke: var(--ember);
+  stroke-width: 4;
+}
+
+.ringText {
+  font-family: var(--font-mono);
+}
+
+.seats {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.seat {
+  display: grid;
+  gap: 8px;
+  padding: 12px var(--gutter);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--slate);
+}
+
+.onTurn {
+  border-color: var(--brass);
+  box-shadow: 0 0 0 1px var(--brass);
+}
+
+.seatHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+
+.seatNo {
+  color: var(--brass);
+  font-weight: 600;
+}
+
+.you {
+  color: var(--verdigris);
+}
+
+.turn {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--brass);
+  color: var(--ink);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.paid {
+  margin: 0;
+  color: var(--bone-muted);
+  font-size: 0.85rem;
+}
+
+.sectionTitle {
+  font-size: 1.15rem;
+  margin-bottom: 6px;
+}
+
+.history {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.latestBid .bidText {
+  color: var(--brass);
+}
+
+.bidText {
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.notice {
+  margin: 0;
+  padding: 12px var(--gutter);
+  border-left: 3px solid var(--brass);
+  border-radius: 4px;
+  background: var(--slate);
+}
+
+.panel {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+  padding: 16px var(--gutter);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--slate);
+}
+
+.ok {
+  margin: 0;
+  color: var(--verdigris);
+}
+
+.winnings {
+  margin: 0;
+  padding-left: 18px;
+}
+
+/* Action bar: a bottom sheet on phones (sticky), a plain card on wider screens. */
+.actionBar {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: grid;
+  gap: 10px;
+  padding: 14px var(--gutter) 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: var(--slate);
+  box-shadow: 0 -8px 24px rgb(0 0 0 / 40%);
+}
+
+@media (min-width: 720px) {
+  .actionBar {
+    position: static;
+    border-radius: var(--radius);
+    box-shadow: none;
+  }
+}
+
+.yourTurn {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.picker {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+
+.rule {
+  margin: 0;
+  color: var(--bone-muted);
+  font-size: 0.9rem;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stepper button {
+  min-width: 48px;
+}
+
+.quantity {
+  min-width: 56px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 1.3rem;
+}
+
+.faces {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.faceButton {
+  display: grid;
+  place-items: center;
+  min-height: 48px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--ink);
+  cursor: pointer;
+}
+
+.faceButton:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.faceChosen {
+  border-color: var(--brass);
+  box-shadow: 0 0 0 2px var(--brass);
+}
+
+.liar {
+  justify-self: start;
+  background: var(--ember);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  letter-spacing: 0.04em;
+}
