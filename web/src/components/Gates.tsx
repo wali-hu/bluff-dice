@@ -7,6 +7,7 @@ import { MIN_ETH_WEI } from "@/chain/gates";
 import { useWalletGate } from "@/chain/useWalletGate";
 import { SEPOLIA_FAUCET_URL } from "@/config/env";
 import { METAMASK_DOWNLOAD_URL } from "@/config/links";
+import { onboardingTimer } from "@/lib/stepTimer";
 import { SEPOLIA_CHAIN_ID } from "@/contracts/addresses";
 
 import styles from "./Gates.module.css";
@@ -55,7 +56,10 @@ export function NetworkGate() {
           type="button"
           className="button button-primary"
           disabled={switchChain.isPending}
-          onClick={() => switchChain.mutate({ chainId: SEPOLIA_CHAIN_ID })}
+          onClick={() => {
+            onboardingTimer.prompt("switchNetwork");
+            switchChain.mutate({ chainId: SEPOLIA_CHAIN_ID });
+          }}
         >
           {switchChain.isPending ? "Confirm in your wallet…" : "Switch to Sepolia"}
         </button>

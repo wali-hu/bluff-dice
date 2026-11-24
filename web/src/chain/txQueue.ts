@@ -26,6 +26,11 @@ export type TxEvent =
   | { readonly type: "submitted"; readonly hash: Hex }
   | { readonly type: "mined"; readonly blockNumber: bigint; readonly success: boolean }
   | { readonly type: "failed"; readonly error: TxError }
+  /**
+   * Back-to-back writes (plain EOAs only): the previous write is pending and the next one goes to the wallet
+   * without waiting for its receipt.
+   */
+  | { readonly type: "nextPrompt"; readonly label: string; readonly gas: bigint }
   /** User dismissed a result, or confirmed they cleared the wallet's pending transaction. */
   | { readonly type: "reset" };
 
@@ -67,6 +72,8 @@ export function txReducer(state: TxState, event: TxEvent): TxState {
       return state.status === "simulating" ? { status: "estimating", label: state.label } : state;
     case "estimated":
       return state.status === "estimating" ? { status: "awaitingWallet", label: state.label, gas: event.gas } : state;
+    case "nextPrompt":
+      return state.status === "pending" ? { status: "awaitingWallet", label: event.label, gas: event.gas } : state;
     case "submitted":
       return state.status === "awaitingWallet" ? { status: "pending", label: state.label, hash: event.hash } : state;
     case "mined":

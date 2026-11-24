@@ -7,7 +7,9 @@ import styles from "./SiteHeader.module.css";
 
 const LINKS = [
   { href: "/", label: "Home" },
-  { href: "/how-to-play", label: "How to play" },
+  { href: "/play", label: "Play" },
+  { href: "/lobby", label: "Lobby" },
+  { href: "/how-to-play", label: "Rules" },
 ] as const;
 
 export function NavLinks() {

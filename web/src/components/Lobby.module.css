@@ -1,0 +1,102 @@
+.lobby {
+  display: grid;
+  gap: 24px;
+}
+
+.heading {
+  font-size: 1.25rem;
+  margin-bottom: 10px;
+}
+
+.list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 12px var(--gutter);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--slate);
+}
+
+.rowMain {
+  flex: 1 1 220px;
+}
+
+.rowTitle {
+  font-weight: 600;
+}
+
+.muted {
+  margin: 0;
+  color: var(--bone-muted);
+  font-size: 0.95rem;
+}
+
+.card {
+  padding: 18px var(--gutter);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--slate);
+}
+
+.form {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+}
+
+.fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.fieldset legend {
+  margin-bottom: 6px;
+}
+
+.choices {
+  display: flex;
+  gap: 8px;
+}
+
+.choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.choice:has(input:checked) {
+  border-color: var(--brass);
+  color: var(--brass);
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.field select {
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--ink);
+  color: var(--bone);
+  font: inherit;
+}

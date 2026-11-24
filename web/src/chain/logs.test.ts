@@ -11,12 +11,12 @@ describe("chunkRanges", () => {
     for (let i = 1; i < ranges.length; i++) expect(ranges[i]?.fromBlock).toBe((ranges[i - 1]?.toBlock ?? 0n) + 1n);
   });
 
-  it("returns newest first when asked", () => {
+  it("returns newest first when asked, aligned to the head (full first range)", () => {
     const ranges = chunkRanges(0n, 120_000n, { newestFirst: true });
     expect(ranges.map((r) => [r.fromBlock, r.toBlock])).toEqual([
-      [100_000n, 120_000n],
-      [50_000n, 99_999n],
-      [0n, 49_999n],
+      [70_001n, 120_000n],
+      [20_001n, 70_000n],
+      [0n, 20_000n],
     ]);
   });
 

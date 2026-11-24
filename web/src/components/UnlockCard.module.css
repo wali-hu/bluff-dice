@@ -1,0 +1,34 @@
+.card {
+  margin-top: 16px;
+  padding: 16px var(--gutter);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--verdigris);
+  border-radius: var(--radius);
+  background: var(--slate);
+}
+
+.title {
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+}
+
+.context {
+  margin-bottom: 6px;
+  color: var(--bone);
+}
+
+.text {
+  color: var(--bone-muted);
+  font-size: 0.95rem;
+}
+
+.message {
+  margin: 8px 0 0;
+  padding-left: 10px;
+  border-left: 3px solid var(--ember);
+}
+
+.done {
+  margin-top: 12px;
+  color: var(--verdigris);
+}

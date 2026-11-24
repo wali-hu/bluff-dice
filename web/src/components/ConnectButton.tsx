@@ -6,6 +6,7 @@ import { useConnect, useConnection, useConnectors, useDisconnect, type Connector
 import { connectView } from "@/chain/connectState";
 import { useHasInjectedWallet, useMounted } from "@/chain/useWalletGate";
 import { METAMASK_DOWNLOAD_URL } from "@/config/links";
+import { onboardingTimer } from "@/lib/stepTimer";
 
 import styles from "./ConnectButton.module.css";
 
@@ -94,7 +95,11 @@ export function ConnectButton() {
         disabled={busy}
         aria-expanded={onlyOne ? undefined : open}
         aria-controls={onlyOne ? undefined : "wallet-menu"}
-        onClick={() => (onlyOne ? connect.mutate({ connector: onlyOne }) : setOpen((v) => !v))}
+        onClick={() => {
+          if (!onlyOne) return setOpen((v) => !v);
+          onboardingTimer.prompt("connect");
+          connect.mutate({ connector: onlyOne });
+        }}
       >
         {busy ? "Waiting for wallet…" : "Connect wallet"}
       </button>
@@ -107,6 +112,7 @@ export function ConnectButton() {
                 className={`button button-ghost ${styles.walletOption}`}
                 onClick={() => {
                   setOpen(false);
+                  onboardingTimer.prompt("connect");
                   connect.mutate({ connector });
                 }}
               >

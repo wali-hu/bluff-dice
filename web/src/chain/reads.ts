@@ -167,3 +167,34 @@ type DiceReadArgs<F extends DiceReadName> = ContractFunctionArgs<typeof bluffDic
 type DiceReadResult<F extends DiceReadName> = ContractFunctionReturnType<typeof bluffDiceAbi, "view", F>;
 type ChipsReadArgs<F extends ChipsReadName> = ContractFunctionArgs<typeof bluffChipsAbi, "view", F>;
 type ChipsReadResult<F extends ChipsReadName> = ContractFunctionReturnType<typeof bluffChipsAbi, "view", F>;
+
+/** Table ids (from `ids`) that dropped `player` as a non-payer: they cannot rejoin those tables. */
+export async function getDroppedIds(
+  client: PublicClient,
+  tableIds: readonly bigint[],
+  player: Address,
+): Promise<Set<bigint>> {
+  if (tableIds.length === 0) return new Set();
+  const results = await withLagRetry(async () => {
+    const blockNumber = await readBlockNumber(client);
+    return client.multicall({
+      contracts: tableIds.map((id) => ({ ...dice, functionName: "dropped", args: [id, player] }) as const),
+      allowFailure: true,
+      multicallAddress: MULTICALL3_ADDRESS,
+      blockNumber,
+    });
+  });
+  const dropped = new Set<bigint>();
+  results.forEach((result, i) => {
+    const id = tableIds[i];
+    if (id !== undefined && result.status === "success" && result.result === true) dropped.add(id);
+  });
+  return dropped;
+}
+
+/** The newest `count` table ids (nextTableId - 1 down to 1). */
+export function newestTableIds(nextTableId: bigint, count = 50): bigint[] {
+  const ids: bigint[] = [];
+  for (let id = nextTableId - 1n; id >= 1n && ids.length < count; id--) ids.push(id);
+  return ids;
+}

@@ -3,34 +3,29 @@ import type { Metadata } from "next";
 import { ChipsCard } from "@/components/ChipsCard";
 import { FheInitPanel } from "@/components/FheInitPanel";
 import { WalletGate } from "@/components/Gates";
-import { ReadinessChecklist } from "@/components/ReadinessChecklist";
+import { OnboardingStepper } from "@/components/OnboardingStepper";
 
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "Get ready to play",
-  description: "Check your wallet, network and test ETH before your first game of Bluff.",
+  title: "Play",
+  description: "Connect, claim free test chips, authorize the table and take a seat.",
 };
 
-/** Shell of the onboarding route (S2). The stepper (claim chips, authorize, join) arrives in step E4. */
 export default function PlayPage() {
   return (
     <div className="container">
       <header className={styles.intro}>
-        <h1 className={styles.title}>Get ready to play</h1>
-        <p className={styles.lead}>
-          Bluff runs on the Ethereum Sepolia testnet. Check these first; tables open in the next update.
-        </p>
+        <h1 className={styles.title}>Play</h1>
+        <p className={styles.lead}>Five short steps. Steps you have already done are skipped.</p>
       </header>
       <WalletGate />
-      <section className={styles.card} aria-labelledby="ready-title">
-        <h2 id="ready-title" className={styles.cardTitle}>
-          Your setup
-        </h2>
-        <ReadinessChecklist />
-      </section>
-      <FheInitPanel />
-      <ChipsCard />
+      <OnboardingStepper />
+      <details className={styles.diagnostics}>
+        <summary>Encryption toolkit and chip balance</summary>
+        <FheInitPanel />
+        <ChipsCard />
+      </details>
     </div>
   );
 }

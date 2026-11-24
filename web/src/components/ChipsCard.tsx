@@ -3,22 +3,18 @@
 import { useState } from "react";
 import type { Hex } from "viem";
 import { useConnection, usePublicClient } from "wagmi";
-import { signTypedData } from "wagmi/actions";
 
 import { getBalanceHandle } from "@/chain/reads";
-import { wagmiConfig } from "@/chain/wagmi";
 import { BLUFF_CHIPS_ADDRESS, SEPOLIA_CHAIN_ID } from "@/contracts/addresses";
-import type { TypedDataSigner } from "@/fhe/client";
 import { FheError } from "@/fhe/errors";
 import { useFheClient, useUnlockedUser } from "@/fhe/FheProvider";
 import { ZERO_HANDLE } from "@/fhe/sdkClient";
+import { signWithWallet } from "@/fhe/walletSigner";
 import { formatChips } from "@/lib/chips";
+import { onboardingTimer } from "@/lib/stepTimer";
 
 import styles from "./ChipsCard.module.css";
 import { RelayerStatus } from "./RelayerStatus";
-
-const signWithWallet: TypedDataSigner = (typedData) =>
-  signTypedData(wagmiConfig, typedData as unknown as Parameters<typeof signTypedData>[1]);
 
 interface Reading {
   user: string;
@@ -74,6 +70,7 @@ export function ChipsCard() {
       let unlockMs: number | undefined;
       if (withUnlock) {
         const t0 = performance.now();
+        onboardingTimer.prompt("signature");
         await client.unlock(address, signWithWallet, { walletChainId: chainId });
         unlockMs = performance.now() - t0;
       }

@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { formatEstimate, type PlayEstimate } from "@/lib/estimate";
 
+import { BotCta } from "./BotCta";
 import styles from "./PlayCta.module.css";
 
 interface PlayCtaProps {
@@ -9,8 +10,7 @@ interface PlayCtaProps {
 }
 
 /**
- * Primary call to action. Disabled until the onboarding flow exists (step E4); the cost line always comes from
- * lib/estimate.ts.
+ * Primary call to action. The cost line always comes from lib/estimate.ts (targets until measured).
  */
 export function PlayCta({ estimate }: PlayCtaProps) {
   const text = formatEstimate(estimate);
@@ -20,9 +20,10 @@ export function PlayCta({ estimate }: PlayCtaProps) {
         Play
       </h2>
       <div className={styles.actions}>
-        <button type="button" className="button button-primary" disabled aria-describedby="play-cost play-status">
+        <BotCta />
+        <Link href="/play" className="button button-primary" aria-describedby="play-cost">
           Play
-        </button>
+        </Link>
         <Link href="/how-to-play" className="button button-ghost">
           How to play
         </Link>
@@ -31,8 +32,8 @@ export function PlayCta({ estimate }: PlayCtaProps) {
         Play: {text}
         {estimate.measured ? "" : " (estimate)"}.
       </p>
-      <p id="play-status" className={styles.status}>
-        Playing opens soon. Until then, learn the rules in under a minute.
+      <p className={styles.status}>
+        New here? The rules take under a minute. Prefer to pick a table? <Link href="/lobby">Open the lobby</Link>.
       </p>
     </section>
   );

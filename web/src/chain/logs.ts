@@ -22,11 +22,20 @@ export function chunkRanges(
   if (span <= 0n) throw new Error("span must be positive");
   if (toBlock < fromBlock) return [];
   const ranges: BlockRange[] = [];
+  if (newestFirst) {
+    // Aligned to the head, so the first range is a full span of the newest blocks.
+    for (let end = toBlock; end >= fromBlock; end -= span) {
+      const start = end - span + 1n > fromBlock ? end - span + 1n : fromBlock;
+      ranges.push({ fromBlock: start, toBlock: end });
+      if (start === fromBlock) break;
+    }
+    return ranges;
+  }
   for (let start = fromBlock; start <= toBlock; start += span) {
     const end = start + span - 1n < toBlock ? start + span - 1n : toBlock;
     ranges.push({ fromBlock: start, toBlock: end });
   }
-  return newestFirst ? ranges.reverse() : ranges;
+  return ranges;
 }
 
 const RANGE_TOO_LARGE_RE = /range|too many|limit exceeded|query returned more than|response size/i;
@@ -125,15 +134,22 @@ export async function findOperatorExpiry(
   options: Omit<ScanOptions, "newestFirst">,
 ): Promise<bigint | undefined> {
   for await (const { logs } of scanChipLogs(client, { ...options, newestFirst: true })) {
-    for (let i = logs.length - 1; i >= 0; i--) {
-      const log = logs[i];
-      if (
-        log?.eventName === "OperatorSet" &&
-        log.args.holder.toLowerCase() === holder.toLowerCase() &&
-        log.args.operator.toLowerCase() === BLUFF_DICE_ADDRESS.toLowerCase()
-      ) {
-        return BigInt(log.args.until);
-      }
+    const until = operatorUntilFromLogs(logs, holder);
+    if (until !== undefined) return until;
+  }
+  return undefined;
+}
+
+/** `until` of the newest `OperatorSet(holder, BluffDice, until)` in `logs` (chain order), or undefined. */
+export function operatorUntilFromLogs(logs: readonly ChipLog[], holder: Address): bigint | undefined {
+  for (let i = logs.length - 1; i >= 0; i--) {
+    const log = logs[i];
+    if (
+      log?.eventName === "OperatorSet" &&
+      log.args.holder.toLowerCase() === holder.toLowerCase() &&
+      log.args.operator.toLowerCase() === BLUFF_DICE_ADDRESS.toLowerCase()
+    ) {
+      return BigInt(log.args.until);
     }
   }
   return undefined;

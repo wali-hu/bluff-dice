@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Fraunces, IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 
 import { Disclaimer } from "@/components/Disclaimer";
+import { DebugPanel } from "@/components/DebugPanel";
 import { ConnectedGates } from "@/components/Gates";
 import { SiteHeader } from "@/components/SiteHeader";
 
@@ -48,6 +49,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <main id="main" tabIndex={-1}>
             {children}
           </main>
+          <DebugPanel />
           <Disclaimer />
         </Providers>
       </body>

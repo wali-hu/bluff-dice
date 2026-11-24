@@ -23,3 +23,13 @@
   font-size: 1.2rem;
   margin: 0;
 }
+
+.diagnostics {
+  margin-top: 24px;
+}
+
+.diagnostics summary {
+  cursor: pointer;
+  color: var(--brass);
+  font-weight: 500;
+}
