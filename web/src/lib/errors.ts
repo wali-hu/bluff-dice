@@ -223,3 +223,11 @@ export const REAUTHORIZE_LABEL = "Authorize again (one transaction)";
 export function reauthorizeNext(authorizeOk: boolean, retriesSoFar: number): "retry" | "stop" {
   return authorizeOk && retriesSoFar === 0 ? "retry" : "stop";
 }
+
+/**
+ * E5-R11 (owner 2026-11-24): the original error text (it can contain raw hex) is shown only in debug mode
+ * (`?debug=1`). Everyone else sees the plain-words message only. Pure.
+ */
+export function technicalDetail(detail: string | undefined, debug: boolean): string | null {
+  return debug && detail ? detail : null;
+}

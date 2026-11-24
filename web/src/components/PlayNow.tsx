@@ -5,8 +5,9 @@ import { useEffect, useRef } from "react";
 
 import { useTxQueue } from "@/chain/TxQueueProvider";
 import { usePlayNow } from "@/chain/usePlayNow";
+import { technicalDetail } from "@/lib/errors";
 import { PLAY_STEP_LABELS, PLAY_STEPS, progressOf, UPGRADE_NOTICE } from "@/lib/playNow";
-import { useSearchParam } from "@/lib/useSearchParam";
+import { useDebugFlag, useSearchParam } from "@/lib/useSearchParam";
 
 import styles from "./PlayNow.module.css";
 
@@ -28,6 +29,8 @@ export function PlayNow() {
   const requested = tableParam && /^\d+$/.test(tableParam) ? BigInt(tableParam) : undefined;
   const { run, done, seatedId, elsewhereId, start, oneByOne, joinAnyway } = usePlayNow(requested);
   const tx = useTxQueue();
+  const debug = useDebugFlag();
+  const detail = technicalDetail(run.failed?.detail, debug);
   const progress = progressOf(done, run);
   const allDone = PLAY_STEPS.every((s) => progress[s] === "done");
 
@@ -140,10 +143,10 @@ export function PlayNow() {
         {run.failed ? (
           <div className={styles.error} role="alert">
             <p>{run.failed.message}</p>
-            {run.failed.detail ? (
+            {detail ? (
               <details>
-                <summary>Technical details</summary>
-                <p className="mono">{run.failed.detail}</p>
+                <summary>Technical details (debug)</summary>
+                <p className="mono">{detail}</p>
               </details>
             ) : null}
           </div>

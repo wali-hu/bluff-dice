@@ -64,6 +64,22 @@ export async function readBlockNumber(client: PublicClient, minBlock = getPinned
   return head >= minBlock ? head : minBlock;
 }
 
+/**
+ * Simulates a write at a block >= our last receipt (RPC lag rule): a lagging node fails loudly and the lag error is
+ * retried, instead of simulating against state from before our own last transaction (e.g. an operator grant it
+ * has not seen yet). Nothing pinned yet: "latest".
+ */
+export async function simulateAtPinnedBlock(
+  client: Pick<PublicClient, "getBlockNumber" | "simulateContract">,
+  call: object,
+  delays: readonly number[] = LAG_RETRY_DELAYS_MS,
+): Promise<void> {
+  await withLagRetry(async () => {
+    const blockNumber = await readBlockNumber(client as PublicClient);
+    await client.simulateContract({ ...call, blockNumber } as never);
+  }, delays);
+}
+
 async function readDice<const F extends DiceReadName>(
   client: PublicClient,
   functionName: F,

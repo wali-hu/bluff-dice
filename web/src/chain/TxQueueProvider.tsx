@@ -8,7 +8,7 @@ import { toTxError, type TxError } from "@/lib/errors";
 import { onboardingTimer } from "@/lib/stepTimer";
 
 import { pinReadsTo } from "./readPin";
-import { readBlockNumber, withLagRetry } from "./reads";
+import { simulateAtPinnedBlock } from "./reads";
 import { busyReason, gasWithMargin, initialTxState, isBusy, txReducer, type TxState } from "./txQueue";
 
 export interface WriteRequest<
@@ -79,10 +79,7 @@ export function TxQueueProvider({ children }: { children: React.ReactNode }) {
         async function prepare(call: (typeof calls)[number]): Promise<bigint> {
           // RPC-lag rule: after one of our receipts, simulate at a block >= it (a lagging node retries, never
           // answers from older state, e.g. an operator grant it has not seen yet).
-          await withLagRetry(async () => {
-            const blockNumber = await readBlockNumber(publicClient!);
-            await publicClient!.simulateContract({ ...call, blockNumber } as never);
-          });
+          await simulateAtPinnedBlock(publicClient!, call);
           return gasWithMargin(await publicClient!.estimateContractGas(call as never));
         }
         async function send(call: (typeof calls)[number], gas: bigint): Promise<Hex> {
