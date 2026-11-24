@@ -27,6 +27,7 @@ export function createStepTimer(now: () => number = () => performance.now()) {
     notes: [],
   };
   let currentSince = 0;
+  let finished = false;
   const listeners = new Set<() => void>();
   const emit = () => listeners.forEach((l) => l());
 
@@ -50,10 +51,15 @@ export function createStepTimer(now: () => number = () => performance.now()) {
       state = { ...state, seatedAt: t, current: null, steps };
       emit();
     },
+    /** Counts a wallet prompt. Still counted after "seated" (the free unlock signature comes after the seat). */
     prompt(kind: PromptKind) {
-      if (state.seatedAt !== null) return;
+      if (finished) return;
       state = { ...state, prompts: { ...state.prompts, [kind]: state.prompts[kind] + 1 } };
       emit();
+    },
+    /** Stops counting prompts (onboarding over, e.g. after the unlock signature or on the table page). */
+    finish() {
+      finished = true;
     },
     note(text: string) {
       if (state.notes.includes(text)) return;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import type { Address, Hex } from "viem";
+import type { Address, Hex, PublicClient } from "viem";
 import { useConnection, usePublicClient } from "wagmi";
 
 import { BLUFF_CHIPS_ADDRESS, SEPOLIA_CHAIN_ID } from "@/contracts/addresses";
@@ -25,6 +25,29 @@ export interface PlayerChainReads {
 
 export const PLAYER_READS_KEY = "player-reads";
 
+/** The reads behind every onboarding step (also used by Play now right before it decides what to send). */
+export async function fetchPlayerReads(client: PublicClient, user: Address): Promise<PlayerChainReads> {
+  const [lastFaucet, balanceHandle, isOperator, head, code] = await Promise.all([
+    getLastFaucet(client, user),
+    getBalanceHandle(client, user),
+    getIsOperator(client, user),
+    withLagRetry(() => client.getBlockNumber({ cacheTime: 0 })),
+    withLagRetry(() => client.getCode({ address: user })),
+  ]);
+  const operatorUntil = isOperator
+    ? await findOperatorExpiry(client, user, { fromBlock: head - OPERATOR_LOG_BLOCKS, toBlock: head })
+    : undefined;
+  return {
+    lastFaucet,
+    balanceHandle,
+    isOperator,
+    operatorUntil,
+    delegated7702: isEip7702Delegated(code),
+    backToBack: allowsBackToBackWrites(code),
+    readAtBlock: head,
+  };
+}
+
 /** Everything the onboarding steps depend on, read before a step is shown (refreshed every 15 s and after txs). */
 export function usePlayerReads() {
   const client = usePublicClient();
@@ -34,28 +57,7 @@ export function usePlayerReads() {
     queryKey: [PLAYER_READS_KEY, address],
     enabled,
     refetchInterval: 15_000,
-    queryFn: async (): Promise<PlayerChainReads> => {
-      const user = address as Address;
-      const [lastFaucet, balanceHandle, isOperator, head, code] = await Promise.all([
-        getLastFaucet(client!, user),
-        getBalanceHandle(client!, user),
-        getIsOperator(client!, user),
-        withLagRetry(() => client!.getBlockNumber({ cacheTime: 0 })),
-        withLagRetry(() => client!.getCode({ address: user })),
-      ]);
-      const operatorUntil = isOperator
-        ? await findOperatorExpiry(client!, user, { fromBlock: head - OPERATOR_LOG_BLOCKS, toBlock: head })
-        : undefined;
-      return {
-        lastFaucet,
-        balanceHandle,
-        isOperator,
-        operatorUntil,
-        delegated7702: isEip7702Delegated(code),
-        backToBack: allowsBackToBackWrites(code),
-        readAtBlock: head,
-      };
-    },
+    queryFn: () => fetchPlayerReads(client!, address as Address),
   });
 }
 

@@ -19,7 +19,7 @@ export type ConnectView =
   | { kind: "failed"; message: string };
 
 export const CONNECT_MESSAGES = {
-  waiting: "Approve the connection in your wallet",
+  waiting: "Approve the connection, then the switch to Sepolia",
   pendingElsewhere: "Open your wallet to finish connecting",
   rejected: "Connection cancelled.",
   failed: "Could not connect. Try again.",

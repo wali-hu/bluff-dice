@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Address } from "viem";
@@ -18,6 +19,7 @@ import { formatChips } from "@/lib/chips";
 import { defaultDescribeContext, type TxError } from "@/lib/errors";
 import { groupTables, isOpen } from "@/lib/lobby";
 import { balanceTooLow, nextFaucetAt } from "@/lib/onboarding";
+import { seatSituation } from "@/lib/playNow";
 import { DEFAULT_PLAYERS, DEFAULT_STAKE } from "@/lib/stakes";
 import { onboardingTimer } from "@/lib/stepTimer";
 import { useNow } from "@/lib/useNow";
@@ -69,7 +71,13 @@ export function JoinPanel({ reads }: { reads: PlayerChainReads }) {
   });
 
   const groups = lobby.data ? groupTables(lobby.data, address) : null;
-  const myTable = groups?.mine[0];
+  // BluffDice refuses a second seat only at the SAME table; a seat elsewhere is shown, never assumed to be this one.
+  const where = groups
+    ? seatSituation(
+        groups.mine.map((e) => e.id),
+        targetId,
+      )
+    : ({ kind: "free" } as const);
   const bot = botView({
     configured: BOT_ADDRESS !== null,
     tableId: botTable.data ?? undefined,
@@ -131,11 +139,11 @@ export function JoinPanel({ reads }: { reads: PlayerChainReads }) {
     }
   }
 
-  if (myTable) {
+  if (where.kind === "atTarget") {
     return (
       <div className={styles.panel}>
-        <p>You already have a seat at table #{myTable.id.toString()}.</p>
-        <button type="button" className="button button-primary" onClick={() => seated(myTable.id)}>
+        <p>You already have a seat at table #{where.tableId.toString()}.</p>
+        <button type="button" className="button button-primary" onClick={() => seated(where.tableId)}>
           Go to your table
         </button>
       </div>
@@ -144,6 +152,13 @@ export function JoinPanel({ reads }: { reads: PlayerChainReads }) {
 
   return (
     <div className={styles.panel}>
+      {where.kind === "elsewhere" ? (
+        <p className={styles.warning} role="status">
+          You already have a seat at table #{where.tableId.toString()} (
+          <Link href={`/table/${where.tableId}`}>open it</Link>). One account can sit at more than one table; joining
+          below takes a second seat and locks a second stake.
+        </p>
+      ) : null}
       {low ? (
         <p className={styles.warning} role="alert">
           You have {formatChips(balance ?? 0n)} chips; this table needs {formatChips(stakeNeeded)}. Joining without

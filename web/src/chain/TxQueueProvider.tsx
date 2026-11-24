@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useReducer, useRef } from "react";
+import { createContext, useCallback, useContext, useMemo, useReducer, useRef, useState } from "react";
 import type { Abi, Address, ContractFunctionArgs, ContractFunctionName, Hex, TransactionReceipt } from "viem";
 import { usePublicClient, useWalletClient } from "wagmi";
 
@@ -45,6 +45,11 @@ interface TxQueueValue {
     requests: readonly AnyWrite[],
     options: { backToBack: boolean },
   ) => Promise<TxOutcome<TransactionReceipt[]>>;
+  /**
+   * Holds the one-write mutex for a write that does not go through the reducer (the EIP-5792 batch, which has
+   * its own status words). Resolves null without running `work` when another write is in flight.
+   */
+  runExclusive: <T>(label: string, work: () => Promise<T>) => Promise<T | null>;
   reset: () => void;
 }
 
@@ -56,6 +61,7 @@ export function TxQueueProvider({ children }: { children: React.ReactNode }) {
   const { data: walletClient } = useWalletClient();
   // Synchronous guard: two clicks in the same frame must not both pass the `busy` check.
   const lock = useRef(false);
+  const [exclusiveLabel, setExclusiveLabel] = useState<string | null>(null);
 
   const runBatch = useCallback<TxQueueValue["runBatch"]>(
     async (requests, { backToBack }) => {
@@ -141,11 +147,31 @@ export function TxQueueProvider({ children }: { children: React.ReactNode }) {
     [runBatch],
   );
 
+  const runExclusive = useCallback<TxQueueValue["runExclusive"]>(async (label, work) => {
+    if (lock.current) return null;
+    lock.current = true;
+    setExclusiveLabel(label);
+    try {
+      return await work();
+    } finally {
+      lock.current = false;
+      setExclusiveLabel(null);
+    }
+  }, []);
+
   const reset = useCallback(() => dispatch({ type: "reset" }), []);
 
   const value = useMemo<TxQueueValue>(
-    () => ({ state, busy: isBusy(state), reason: busyReason(state), run, runBatch, reset }),
-    [state, run, runBatch, reset],
+    () => ({
+      state,
+      busy: isBusy(state) || exclusiveLabel !== null,
+      reason: exclusiveLabel ? `Finish "${exclusiveLabel}" in your wallet first.` : busyReason(state),
+      run,
+      runBatch,
+      runExclusive,
+      reset,
+    }),
+    [state, run, runBatch, runExclusive, reset, exclusiveLabel],
   );
   return <TxQueueContext.Provider value={value}>{children}</TxQueueContext.Provider>;
 }

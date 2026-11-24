@@ -6,6 +6,7 @@ import { useConnect, useConnection, useConnectors, useDisconnect, type Connector
 import { connectView } from "@/chain/connectState";
 import { useHasInjectedWallet, useMounted } from "@/chain/useWalletGate";
 import { METAMASK_DOWNLOAD_URL } from "@/config/links";
+import { SEPOLIA_CHAIN_ID } from "@/contracts/addresses";
 import { onboardingTimer } from "@/lib/stepTimer";
 
 import styles from "./ConnectButton.module.css";
@@ -98,7 +99,7 @@ export function ConnectButton() {
         onClick={() => {
           if (!onlyOne) return setOpen((v) => !v);
           onboardingTimer.prompt("connect");
-          connect.mutate({ connector: onlyOne });
+          connect.mutate({ connector: onlyOne, chainId: SEPOLIA_CHAIN_ID });
         }}
       >
         {busy ? "Waiting for wallet…" : "Connect wallet"}
@@ -113,7 +114,7 @@ export function ConnectButton() {
                 onClick={() => {
                   setOpen(false);
                   onboardingTimer.prompt("connect");
-                  connect.mutate({ connector });
+                  connect.mutate({ connector, chainId: SEPOLIA_CHAIN_ID });
                 }}
               >
                 {connector.name}

@@ -21,7 +21,9 @@ describe("step timer", () => {
     timer.prompt("signature");
     t += 20_000;
     timer.seated();
-    timer.prompt("transaction"); // after seated: ignored
+    timer.prompt("signature"); // the unlock signature after the seat still counts (K)
+    timer.finish();
+    timer.prompt("transaction"); // after finish: ignored
     const snap = timer.snapshot();
     expect(snap.steps).toEqual([
       { step: "connect", ms: 4_000 },
@@ -30,7 +32,7 @@ describe("step timer", () => {
       { step: "join", ms: 20_000 },
     ]);
     expect(timer.totalMs()).toBe(51_000);
-    expect(snap.prompts).toEqual({ connect: 1, switchNetwork: 0, transaction: 3, signature: 1 });
+    expect(timer.snapshot().prompts).toEqual({ connect: 1, switchNetwork: 0, transaction: 3, signature: 2 });
   });
 
   it("does not stop before it started, and notifies subscribers", () => {

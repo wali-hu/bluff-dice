@@ -21,8 +21,8 @@ export function PlayCta({ estimate }: PlayCtaProps) {
       </h2>
       <div className={styles.actions}>
         <BotCta />
-        <Link href="/play" className="button button-primary" aria-describedby="play-cost">
-          Play
+        <Link href="/play?start=1" className="button button-primary" aria-describedby="play-cost">
+          Play now
         </Link>
         <Link href="/how-to-play" className="button button-ghost">
           How to play

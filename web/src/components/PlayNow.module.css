@@ -1,0 +1,115 @@
+.card {
+  display: grid;
+  gap: 14px;
+  padding: 20px var(--gutter);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--slate);
+}
+
+.title {
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+.lead {
+  margin: 0;
+  color: var(--bone-muted);
+}
+
+.bar {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--bone-muted);
+}
+
+.mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  font-size: 0.85rem;
+}
+
+.stepDone {
+  color: var(--bone);
+}
+
+.stepDone .mark {
+  border-color: var(--verdigris);
+  color: var(--verdigris);
+}
+
+.stepActive {
+  color: var(--bone);
+  font-weight: 600;
+}
+
+.stepActive .mark {
+  border-color: var(--brass);
+  color: var(--brass);
+}
+
+.stepFailed .mark {
+  border-color: var(--ember);
+  color: var(--bone);
+}
+
+.stepTodo {
+  color: var(--bone-muted);
+}
+
+.stepLabel {
+  line-height: 1.3;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.status p {
+  margin: 0 0 6px;
+}
+
+.notice {
+  padding-left: 10px;
+  border-left: 3px solid var(--brass);
+}
+
+.error {
+  padding-left: 10px;
+  border-left: 3px solid var(--ember);
+}
+
+.error details {
+  color: var(--bone-muted);
+  font-size: 0.85rem;
+}
+
+@media (min-width: 720px) {
+  .bar {
+    grid-template-columns: repeat(6, 1fr);
+    align-items: start;
+  }
+
+  .step {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 0.9rem;
+  }
+}
