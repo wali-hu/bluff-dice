@@ -1,0 +1,19 @@
+{
+  "about": "E5-R4 shared bid-rule cases (docs/SPEC.md). Read by web/src/spec/e5.spec.test.ts (app rule) and test/E5BidRules.ts (BluffDice.bid on the Hardhat mock). prev = the current bid before this one, [0, 0] = no bid yet. expect = ok or the BluffDice custom error.",
+  "playerCount": 2,
+  "cases": [
+    { "name": "first bid 1x1", "prev": [0, 0], "bid": [1, 1], "expect": "ok" },
+    { "name": "same quantity higher face", "prev": [3, 4], "bid": [3, 5], "expect": "ok" },
+    { "name": "higher quantity lower face", "prev": [3, 6], "bid": [4, 1], "expect": "ok" },
+    { "name": "jump to the max quantity", "prev": [3, 4], "bid": [10, 1], "expect": "ok" },
+    { "name": "same bid", "prev": [3, 4], "bid": [3, 4], "expect": "BidNotHigher" },
+    { "name": "same quantity lower face", "prev": [3, 4], "bid": [3, 3], "expect": "BidNotHigher" },
+    { "name": "lower quantity higher face", "prev": [3, 4], "bid": [2, 6], "expect": "BidNotHigher" },
+    { "name": "face 0", "prev": [0, 0], "bid": [1, 0], "expect": "InvalidFace" },
+    { "name": "face 7", "prev": [0, 0], "bid": [1, 7], "expect": "InvalidFace" },
+    { "name": "face checked before quantity", "prev": [0, 0], "bid": [0, 0], "expect": "InvalidFace" },
+    { "name": "quantity 0", "prev": [0, 0], "bid": [0, 1], "expect": "InvalidQuantity" },
+    { "name": "quantity players*5+1", "prev": [0, 0], "bid": [11, 1], "expect": "InvalidQuantity" },
+    { "name": "quantity players*5 is allowed", "prev": [0, 0], "bid": [10, 6], "expect": "ok" }
+  ]
+}
