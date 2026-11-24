@@ -95,6 +95,24 @@ fhevm-hardhat-template/
 - [FHEVM Testing Guide](https://docs.zama.ai/protocol/solidity-guides/development-guide/hardhat/write_test)
 - [FHEVM Hardhat Plugin](https://docs.zama.ai/protocol/solidity-guides/development-guide/hardhat)
 
+## Considered and rejected
+
+### Joining a table with `confidentialTransferAndCall` (one wallet prompt fewer)
+
+ERC-7984 can move the stake and notify the game in one transaction (`confidentialTransferAndCall` plus the game's
+`onConfidentialTransferReceived` hook), so a player would not need the separate "authorize the table" (`setOperator`)
+transaction. Not done before the December deadline because:
+
+- The amount must be a fresh encrypted input created in the browser (zero-knowledge proof of the plaintext plus a
+  relayer input proof). That path is new and untested here, and its proof time without browser threads is unknown.
+- BluffDice would need a redeploy: a new address, a new proof round on Sepolia, and the recorded rounds would stay on
+  the old deployment.
+- A token callback adds attack surface to contracts that are otherwise final and tested.
+- About 4-5 days of work and review three weeks before the feature freeze, for one prompt fewer.
+
+Instead the app batches "claim chips", "authorize the table" and "join" into one wallet confirmation with EIP-5792
+(`wallet_sendCalls`) where the wallet supports it, with no contract change.
+
 ## 📄 License
 
 This project is licensed under the BSD-3-Clause-Clear License. See the [LICENSE](LICENSE) file for details.
