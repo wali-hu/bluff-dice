@@ -9,6 +9,7 @@ import { deployGame, fullTable } from "./helpers/fixtures";
 
 interface BidCase {
   name: string;
+  players?: number;
   prev: [number, number];
   bid: [number, number];
   expect: "ok" | "BidNotHigher" | "InvalidFace" | "InvalidQuantity";
@@ -38,7 +39,7 @@ describe("E5-R4: BluffDice.bid on the shared case table", function () {
 
   for (const c of shared.cases) {
     it(`E5-R4: app and contract agree on the shared case table (${c.name})`, async function () {
-      const players = signers.slice(0, shared.playerCount);
+      const players = signers.slice(0, c.players ?? shared.playerCount);
       const { tableId } = await fullTable(game, players);
       // Seat 0 opens. With a previous bid, seat 0 places it and seat 1 makes the tested bid.
       let bidder = players[0];

@@ -36,7 +36,7 @@ const ZERO_HANDLE = `0x${"0".repeat(64)}` as Hex;
 
 const shared = JSON.parse(readFileSync(fileURLToPath(new URL("./e5-bid-cases.json", import.meta.url)), "utf8")) as {
   playerCount: number;
-  cases: { name: string; prev: [number, number]; bid: [number, number]; expect: string }[];
+  cases: { name: string; players?: number; prev: [number, number]; bid: [number, number]; expect: string }[];
 };
 
 // ---- E5-R1 ---------------------------------------------------------------------------------------------------
@@ -141,7 +141,7 @@ describe("E5-R4: bid rule = contract rule", () => {
     expect(check([0, 0], [16, 1], 3)).toBe("InvalidQuantity");
   });
   it("E5-R4: app and contract agree on the shared case table", () => {
-    for (const c of shared.cases) expect(check(c.prev, c.bid, shared.playerCount), c.name).toBe(c.expect);
+    for (const c of shared.cases) expect(check(c.prev, c.bid, c.players ?? shared.playerCount), c.name).toBe(c.expect);
   });
 });
 
@@ -334,6 +334,12 @@ describe("E5-R11: table errors in words", () => {
   });
   it("E5-R11: WrongPhase is silent", () => {
     expect(er.describeContractError("WrongPhase", [1n, 3, 4]).silent).toBe(true);
+  });
+  it("E5-R11: technical details only in debug mode", () => {
+    const raw = "execution reverted: 0xdeadbeefcafebabe0011223344556677";
+    expect(er.technicalDetail(raw, false)).toBeNull();
+    expect(er.technicalDetail(raw, true)).toBe(raw);
+    expect(er.technicalDetail(undefined, true)).toBeNull();
   });
   it("E5-R11: unknown error is generic", () => {
     const e = er.toTxError(new Error("execution reverted: 0xdeadbeefcafebabe0011223344556677"));

@@ -9,6 +9,8 @@ import { renderToStaticMarkup } from "react-dom/server";
 import type { Hex } from "viem";
 import { describe, expect, it, vi } from "vitest";
 
+import { resetPinnedBlockForTests, pinReadsTo } from "@/chain/readPin";
+import * as reads from "@/chain/reads";
 import { NO_SEAT, Phase } from "@/chain/reads";
 import { DeadlineRing } from "@/components/DeadlineRing";
 import * as errors from "@/lib/errors";
@@ -109,5 +111,28 @@ describe("E5 review fixes", () => {
     const pkg = JSON.parse(readFileSync(fileURLToPath(new URL("../../package.json", import.meta.url)), "utf8"));
     const deps = Object.keys({ ...pkg.dependencies, ...pkg.devDependencies });
     expect(deps.filter((d) => /persist|storage|idb|localforage/i.test(d))).toEqual([]);
+  });
+
+  it("RV-10 (E5 TxQueue, owner risk 4): writes are simulated at a block >= our last receipt, lag errors retried", async () => {
+    const sim = (reads as any).simulateAtPinnedBlock;
+    const call = { address: "0x0000000000000000000000000000000000000001", functionName: "bid" };
+    const seen: (bigint | undefined)[] = [];
+    let fails = 1;
+    const client = {
+      getBlockNumber: async () => 90n, // a lagging node, behind our receipt
+      simulateContract: async (c: { blockNumber?: bigint }) => {
+        seen.push(c.blockNumber);
+        if (fails-- > 0) throw new Error("header not found");
+        return {};
+      },
+    };
+    resetPinnedBlockForTests();
+    pinReadsTo(100n);
+    await sim(client, call, [0]);
+    expect(seen).toEqual([100n, 100n]); // never below the receipt block; retried once on the lag error
+    resetPinnedBlockForTests();
+    seen.length = 0;
+    await sim(client, call, [0]);
+    expect(seen).toEqual([undefined]); // nothing pinned yet: "latest"
   });
 });
