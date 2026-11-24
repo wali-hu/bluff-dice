@@ -37,3 +37,19 @@ export function roomView(phase: number): RoomView {
       return { kind: "notFound" };
   }
 }
+
+/**
+ * BluffDice.cancel: allowed in AwaitingPaidProof or AwaitingReveal once `block.timestamp > deadline`
+ * (PROOF_TIMEOUT = 1 hour after the phase started). Anyone may call it; every seated player gets back their own
+ * stored `transferred` amount (a non-payer gets back their encrypted 0). Pure; `nowSeconds` is the browser clock,
+ * so a few seconds early the simulation reverts DeadlineNotPassed and nothing is sent.
+ */
+export type CancelState =
+  | { readonly kind: "none" }
+  | { readonly kind: "wait"; readonly deadline: bigint }
+  | { readonly kind: "available" };
+
+export function cancelState(phase: number, deadline: bigint, nowSeconds: bigint): CancelState {
+  if (phase !== Phase.AwaitingPaidProof && phase !== Phase.AwaitingReveal) return { kind: "none" };
+  return nowSeconds > deadline ? { kind: "available" } : { kind: "wait", deadline };
+}

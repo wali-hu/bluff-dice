@@ -49,3 +49,14 @@ export function leaveWrite(tableId: bigint): WriteRequest<typeof bluffDiceAbi, "
     args: [tableId],
   };
 }
+
+/** `cancel(tableId)`: anyone, after a proof deadline; refunds every seat its own stake. */
+export function cancelWrite(tableId: bigint): WriteRequest<typeof bluffDiceAbi, "cancel"> {
+  return {
+    label: `Cancel table #${tableId}`,
+    address: BLUFF_DICE_ADDRESS,
+    abi: bluffDiceAbi,
+    functionName: "cancel",
+    args: [tableId],
+  };
+}

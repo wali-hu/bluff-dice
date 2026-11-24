@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { Phase } from "@/chain/reads";
 
-import { PHASE_NAMES, roomView } from "./tableRoom";
+import { cancelState, PHASE_NAMES, roomView } from "./tableRoom";
 
 describe("roomView", () => {
   it("maps every contract phase", () => {
@@ -18,5 +18,19 @@ describe("roomView", () => {
 
   it("names every phase", () => {
     for (const value of Object.values(Phase)) expect(PHASE_NAMES[value].length).toBeGreaterThan(0);
+  });
+});
+
+describe("cancelState (BluffDice.cancel)", () => {
+  it("is only offered while a proof is awaited", () => {
+    expect(cancelState(Phase.Joining, 0n, 100n)).toEqual({ kind: "none" });
+    expect(cancelState(Phase.Bidding, 50n, 100n)).toEqual({ kind: "none" });
+    expect(cancelState(Phase.Cancelled, 50n, 100n)).toEqual({ kind: "none" });
+  });
+
+  it("waits until block.timestamp > deadline (strict, as in the contract)", () => {
+    expect(cancelState(Phase.AwaitingPaidProof, 100n, 100n)).toEqual({ kind: "wait", deadline: 100n });
+    expect(cancelState(Phase.AwaitingPaidProof, 100n, 101n)).toEqual({ kind: "available" });
+    expect(cancelState(Phase.AwaitingReveal, 100n, 101n)).toEqual({ kind: "available" });
   });
 });

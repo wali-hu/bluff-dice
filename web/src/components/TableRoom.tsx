@@ -9,18 +9,20 @@ import { useConnection, usePublicClient } from "wagmi";
 import { getTable, NO_SEAT } from "@/chain/reads";
 import { useTxQueue } from "@/chain/TxQueueProvider";
 import { useMounted } from "@/chain/useWalletGate";
-import { leaveWrite } from "@/chain/writes";
+import { cancelWrite, leaveWrite } from "@/chain/writes";
 import { isBotAddress } from "@/config/bot";
 import { formatChips } from "@/lib/chips";
+import { defaultDescribeContext } from "@/lib/errors";
 import { isOpen, seatOfIn } from "@/lib/lobby";
 import { potOf } from "@/lib/stakes";
-import { PHASE_NAMES, roomView } from "@/lib/tableRoom";
+import { cancelState, PHASE_NAMES, roomView } from "@/lib/tableRoom";
+import { useNow } from "@/lib/useNow";
 
 import { BotBadge } from "./BotBadge";
 import styles from "./TableRoom.module.css";
 import { TxStatus } from "./TxStatus";
+import { EncryptedAmountNote } from "./EncryptedAmountNote";
 import { UnlockCard } from "./UnlockCard";
-import { EncryptedAmountNote } from "@/components/EncryptedAmountNote";
 
 const ZERO = "0x0000000000000000000000000000000000000000";
 
@@ -143,9 +145,45 @@ export function TableRoom({ id }: { id: string }) {
           <p className={styles.notice} role="status">
             {view.text}
           </p>
+          <CancelPanel tableId={tableId} phase={t.phase} deadline={t.deadline} />
           {seated && view.kind !== "over" ? <UnlockCard context="Your dice will need it:" /> : null}
         </>
       )}
+    </div>
+  );
+}
+
+/**
+ * Stuck tables give the stakes back: after the proof deadline anyone may call `cancel`, and every seat gets its
+ * own stake back. Shown to seated players and spectators alike.
+ */
+function CancelPanel({ tableId, phase, deadline }: { tableId: bigint; phase: number; deadline: bigint }) {
+  const tx = useTxQueue();
+  const now = BigInt(Math.floor(useNow() / 1000));
+  const state = cancelState(phase, deadline, now);
+  if (state.kind === "none") return null;
+  if (state.kind === "wait") {
+    return (
+      <p className={styles.muted}>
+        If this step is not sent onchain by {defaultDescribeContext.formatTime(state.deadline)}, anyone can cancel the
+        table and every player gets their own stake back.
+      </p>
+    );
+  }
+  return (
+    <div>
+      <p className={styles.muted}>
+        The deadline has passed. Anyone can now cancel this table: every player gets their own stake back.
+      </p>
+      <button
+        type="button"
+        className="button button-ghost"
+        disabled={tx.busy}
+        onClick={() => void tx.run(cancelWrite(tableId))}
+      >
+        Cancel table and refund every stake
+      </button>
+      <EncryptedAmountNote />
     </div>
   );
 }
